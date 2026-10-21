@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "publish": "node scripts/publish.mjs",
     "test": "node tests/run.mjs",
     "capturas": "node tests/capturas.mjs"
   },

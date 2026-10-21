@@ -1,0 +1,20 @@
+# Cabeceras de publicación (formato de Cloudflare Pages). scripts/publish.mjs sustituye el marcador de la CSP por el hash
+# SHA-256 del script en línea de cada página y escribe el resultado como dist/_headers.
+#
+# CSP: todo del mismo origen. El único script en línea (el del tema, en <head>) se autoriza por hash, sin 'unsafe-inline'.
+# style-src-attr 'unsafe-inline' solo cubre los atributos style="…" (propiedades personalizadas de las partículas, el minimapa y la
+# entrada escalonada, y el estilo del SVG de iconos oculto); no admite hojas ni elementos <style> en línea. img-src incluye data:
+# porque las texturas de líneas de escaneo son SVG en data URI dentro del CSS. Los enlaces externos son solo navegación.
+#
+# Caché: los archivos de assets/ no llevan hash en el nombre, así que no se marcan como inmutables: caché corta con
+# revalidación. El HTML usa la caché por defecto de la plataforma (revalidar siempre).
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'none'; script-src 'self' {{SCRIPT_HASHES}}; style-src 'self'; style-src-attr 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'
+
+/assets/*
+  Cache-Control: public, max-age=3600, must-revalidate

@@ -71,6 +71,10 @@
 - De la referencia de estudio se tomó solo la idea de la línea de tiempo con nodos y la etiqueta de tecnologías por puesto; se rechazaron sus descripciones largas de bajo contraste.
 - Las partículas no cambian (12, misma posición y comportamiento).
 
+### Publicación (22 oct 2026)
+- `npm run publish` genera `dist/` con una lista permitida y las cabeceras de seguridad (`scripts/_headers.template`). CSP: todo del mismo origen; script en línea del tema autorizado por hash; `style-src-attr 'unsafe-inline'` solo para los atributos `style="…"` (propiedades personalizadas de efectos y el SVG de iconos oculto), sin hojas ni `<style>` en línea; `img-src` con `data:` por las texturas SVG de las líneas de escaneo.
+- Sin hash en los nombres de assets: caché corta con revalidación. Si algún día se quiere caché inmutable, hay que añadir hash a los nombres en `publish.mjs`.
+
 ### Defectos de D2 ya corregidos en D3
 - La etiqueta del botón de tema era siempre la misma y usaba `aria-pressed`: ahora dice la acción («Tema claro» en oscuro, «Tema oscuro» en claro) y no usa `aria-pressed`.
 - La línea actual del modo claro era un amarillo fuerte (`#fff8c5`): ahora es `#fffceb`.

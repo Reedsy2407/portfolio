@@ -30,6 +30,23 @@ El CV se enlaza solo si existe `assets/cv/CV_Angel_Saenz.pdf` al generar el siti
 
 Las páginas HTML se generan: edita el contenido en `scripts/build.mjs` y ejecuta `node scripts/build.mjs`. Los estilos y el script están en `assets/css/site.css` y `assets/js/site.js`.
 
+## Preparar la publicación
+
+```
+npm run publish
+```
+
+(o `node scripts/publish.mjs`). Genera el sitio, vacía y recrea `dist/` (ignorada por git) y copia solo una lista permitida. No despliega nada ni usa la red. `dist/` contiene exactamente:
+
+| Entrada | Qué es |
+|---|---|
+| `index.html`, `en/index.html` | el portafolio en español e inglés |
+| `404.html` | página de error con rutas absolutas desde la raíz (`/assets/…`), para que se vea bien bajo cualquier ruta; el 404 de desarrollo no cambia |
+| `assets/` | CSS, JS, fuentes con sus licencias, favicon y el CV |
+| `_headers` | cabeceras de seguridad (nosniff, Referrer-Policy, X-Frame-Options, Permissions-Policy y una CSP estricta del mismo origen, con el script en línea autorizado por su hash) y caché corta con revalidación para `assets/`; se genera desde `scripts/_headers.template` |
+
+Nada más entra en `dist/` (ni `design/`, `tests/`, `scripts/`, `package*.json`, notas ni capturas). Como los archivos de `assets/` no llevan hash en el nombre, no se marcan como inmutables. El formato de `_headers` es el de Cloudflare Pages; el CV, si cambia, se sustituye en `assets/cv/` antes de publicar.
+
 ## Pruebas
 
 Las pruebas usan un navegador automatizado ([`playwright-core`](https://playwright.dev), solo para desarrollo) contra el sitio servido en un puerto local libre. Una vez:
@@ -54,6 +71,7 @@ Qué comprueban:
 - **movimiento**: `prefers-reduced-motion` (apaga partículas, glitch, tecleo, entrada y cursor parpadeante), partículas, glitch único, líneas ≤ 8 %, solo `opacity` y `transform`, botón de tema;
 - **contenido**: legible sin JavaScript, enlaces externos con `rel="noopener noreferrer"`, aviso previo al sistema real, anclas válidas, reglas de estilo del brief;
 - **pulido**: copiar el correo (con y sin JavaScript), iconos `aria-hidden`, secciones quitadas, disponibilidad única, enlaces de proyecto y legibilidad de la línea de tiempo (interlineado, ancho de línea, aire entre puestos);
+- **publicación**: `dist/` con exactamente la lista permitida, enlaces internos y recursos sin romper, el CV, ausencia de teléfono y de clientes finales, cabeceras presentes y la CSP aplicada de verdad (cero violaciones y cero errores de consola al usar tema, paleta, scroll y copiar el correo), y el 404 bajo una ruta profunda;
 - **datos confirmados**: el CV nunca queda como enlace roto, ningún número parece un teléfono, el único correo es el confirmado y no se nombra a los clientes finales;
 - **CPU en reposo**: se mide y se informa (objetivo ≈ 2 % de un núcleo). Se mide en un navegador sin interfaz con rasterizado por software, así que no sustituye a una medición con GPU real.
 
