@@ -1,0 +1,6 @@
+Fuentes de la dirección D3 (woff2 estáticos de @fontsource, versiones fijadas, subconjunto latino).
+Todas con licencia SIL Open Font License 1.1; el texto completo está en los archivos LICENSE-*.txt de esta carpeta.
+
+- Pixelify Sans 700 (nombre y títulos de sección). © 2021 The Pixelify Sans Project Authors. LICENSE-pixelify-sans-OFL.txt
+- Geist Mono 400 y 700 (código, etiquetas, énfasis). © 2024 The Geist Project Authors. LICENSE-geist-mono-OFL.txt
+- Instrument Sans 400 (texto de lectura). © 2022 The Instrument Sans Project Authors. LICENSE-instrument-sans-OFL.txt

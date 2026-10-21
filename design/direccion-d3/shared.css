@@ -1,0 +1,103 @@
+/* Utilidades comunes de la exploración. Solo tokens: cada dirección define los suyos sobre design/styles.css.
+   Tokens estructurales que comparten las direcciones exploradas (se anotan en el brief si la dirección elegida los conserva). */
+:root {
+  --hair: 1px;
+  --rule: 2px;
+  --measure: 62ch;
+  --lh-tight: 1.1;
+  --lh-body: 1.55;
+  --lh-loose: 1.7;
+  --track-tight: -0.03em;
+  --track-label: 0.08em;
+  --rise: 12px;
+  --stagger: 70ms;
+  --count-dur: 900ms;
+  --dur-load: 1200ms;
+}
+
+.sr {
+  position: absolute;
+  width: var(--hair);
+  height: var(--hair);
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip {
+  position: absolute;
+  left: var(--space-4);
+  top: calc(-1 * var(--space-12) * 2);
+  min-height: var(--touch);
+  padding: var(--space-3) var(--space-4);
+  background: var(--ink);
+  color: var(--paper);
+  z-index: 10;
+}
+.skip:focus {
+  top: var(--space-4);
+}
+
+/* Entrada orquestada: solo opacidad y transform, escalonada con --i. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise));
+  }
+}
+.rise {
+  animation: rise var(--dur-load) var(--ease) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger));
+}
+
+/* Cifras que cuentan hacia arriba. El valor real vive en .sr; el contador es decorativo (aria-hidden). */
+@property --n {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
+@keyframes count {
+  to {
+    --n: var(--to);
+  }
+}
+.count {
+  --n: 0;
+  counter-reset: n var(--n);
+  animation: count var(--count-dur) var(--ease) both;
+}
+.count::after {
+  content: counter(n);
+}
+
+/* Botones y enlaces de acción: área táctil de 44 px como mínimo. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch);
+  padding: var(--space-3) var(--space-6);
+  text-decoration: none;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.nav a,
+.links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th,
+td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  vertical-align: top;
+}
