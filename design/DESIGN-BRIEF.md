@@ -57,6 +57,12 @@
 4. Reproducir en el sitio real las comprobaciones automáticas de la maqueta (contraste contra el peor caso, orden y solapes, partículas, glitch, movimiento reducido, sin JS). Las cifras de este brief (contraste del peor caso, CPU, KB de la portada y del JS) salen de pruebas locales con Playwright que **no están versionadas**; en el sitio real se convierten en pruebas del proyecto.
 5. La maqueta tiene enlaces de demostración que se apuntan a sí mismos (**Ver CV**, las entradas de demo y el selector **EN**): en el sitio real apuntan al CV, a la demo, al sistema real y a la versión en inglés. Los enlaces de texto dentro de un párrafo quedan fuera de la exigencia de 44 px (como permite WCAG); los botones, etiquetas y la navegación la cumplen.
 
+### Sitio real (etapa 2): decisiones aplicadas
+- Interruptor «Efectos» en la barra de estado (apaga partículas, brillo y glitch; se recuerda con `try/catch` sobre `localStorage`); su área táctil de 44 px crece sobre la barra de 32 px.
+- Partículas: **12** (8 símbolos y 4 puntos), solo ≥ 1280 px. Líneas de escaneo **≤ 8 %** en todo (la capa del nombre baja de 10 % a 8 % en oscuro; 7 % en claro).
+- Nombre en portada: «Angel Saenz». Inglés con páginas propias bajo `en/` (interruptor ES/EN en la barra de título). Fuente de las páginas: `scripts/build.mjs`.
+- Pruebas versionadas en `tests/` (peso, contraste del peor caso, maquetación, movimiento, contenido, CPU); las cifras de este brief se verifican ahí. CPU medida con el sitio real: ≈ 2,3 % con efectos, ≈ 2,1 % con «Efectos» apagado y ≈ 0,1 % con movimiento reducido (navegador sin interfaz, rasterizado por software).
+
 ### Defectos de D2 ya corregidos en D3
 - La etiqueta del botón de tema era siempre la misma y usaba `aria-pressed`: ahora dice la acción («Tema claro» en oscuro, «Tema oscuro» en claro) y no usa `aria-pressed`.
 - La línea actual del modo claro era un amarillo fuerte (`#fff8c5`): ahora es `#fffceb`.
