@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Angel Saenz — Backend Developer</title>
-<meta name="description" content="Portfolio of Angel Saenz, backend developer in Lima: Java, Spring Boot, Python, Odoo and cloud. Case study: esg-trazabilidad.">
+<meta name="description" content="Portfolio of Angel Saenz, backend developer in Lima: Java, Spring Boot, AWS, Kubernetes and the esg-trazabilidad project.">
 <script>var d=document.documentElement;try{var th=localStorage.getItem('tema');if(th==='claro'||th==='oscuro')d.dataset.theme=th;}catch(e){}d.classList.add('js');window.__e=0;addEventListener('error',function(){window.__e++},true)</script>
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="../assets/fonts/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -26,6 +26,10 @@
 <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
 <symbol id="i-error" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></symbol>
 <symbol id="i-ext" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></symbol>
+<symbol id="i-linkedin" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 11v6M8 7.5v.5M12 17v-6M12 13.5a3 3 0 0 1 6 0V17"/></symbol>
+<symbol id="i-github" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.6 8.4L8 6.4l2.2 1.3h3.6L16 6.4l-.6 2a3.6 3.6 0 0 1 .7 2.2c0 2.2-1.7 3.4-4.1 3.4s-4.1-1.2-4.1-3.4c0-.8.2-1.6.7-2.2zM10 18v-2.5M14 18v-2.5"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5L12 13l8.5-5.5"/></symbol>
+<symbol id="i-cv" viewBox="0 0 24 24"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3v4h4M9 12h6M9 16h4"/></symbol>
 </defs></svg>
 <a class="skip" href="#main">Skip to content</a>
 <header class="titlebar">
@@ -54,32 +58,34 @@
 
   <nav class="explorer" id="explorador" aria-label="Portfolio files">
     <p class="exp-title">Explorer</p>
-    <details open><summary><svg class="ic chev" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg><svg class="ic t-dir" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-folder"/></svg>portafolio</summary><ul><li><a href="#perfil"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>profile.md</a></li><li><a href="#sobre-mi"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>about.md</a></li><li><a href="#habilidades"><svg class="ic t-ts" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>skills.ts</a></li><li><a href="#experiencia"><svg class="ic t-json" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>experience.json</a></li><li><a href="#proyecto"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>esg-trazabilidad.md</a></li><li><a href="#contacto"><svg class="ic t-sh" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>contacto.sh</a></li></ul></details><details open><summary><svg class="ic chev" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg><svg class="ic t-dir" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-folder"/></svg>projects</summary><ul><li><a href="case/esg-trazabilidad.html"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>esg-trazabilidad/</a></li></ul></details>
+    <details open><summary><svg class="ic chev" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg><svg class="ic t-dir" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-folder"/></svg>portafolio</summary><ul><li><a href="#perfil"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>profile.md</a></li><li><a href="#sobre-mi"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>about.md</a></li><li><a href="#habilidades"><svg class="ic t-ts" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>skills.ts</a></li><li><a href="#experiencia"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>experience.md</a></li><li><a href="#proyectos"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>projects.md</a></li></ul></details>
   </nav>
 
   <div class="editor">
-    <nav class="tabs" aria-label="Open files"><ul><li><a href="#perfil"><i class="dot t-md"></i>profile.md</a></li><li><a href="#sobre-mi"><i class="dot t-md"></i>about.md</a></li><li><a href="#habilidades"><i class="dot t-ts"></i>skills.ts</a></li><li><a href="#experiencia"><i class="dot t-json"></i>experience.json</a></li><li><a href="#proyecto"><i class="dot t-md"></i>esg-trazabilidad.md</a></li><li><a href="#contacto"><i class="dot t-sh"></i>contacto.sh</a></li></ul></nav>
+    <nav class="tabs" aria-label="Open files"><ul><li><a href="#perfil"><i class="dot t-md"></i>profile.md</a></li><li><a href="#sobre-mi"><i class="dot t-md"></i>about.md</a></li><li><a href="#habilidades"><i class="dot t-ts"></i>skills.ts</a></li><li><a href="#experiencia"><i class="dot t-md"></i>experience.md</a></li><li><a href="#proyectos"><i class="dot t-md"></i>projects.md</a></li></ul></nav>
     <div class="doc">
       <div class="curline" aria-hidden="true"></div>
       <div class="fx" aria-hidden="true"><i style="--x:90%;--y:59%;--s:20px;--t:20s;--st:100;--sf:20;--d:-9s;--p:9s;--sp:45;--o:0.77;--c:var(--c-str)"><b>{</b></i><i style="--x:78%;--y:70%;--s:23px;--t:20s;--st:100;--sf:20;--d:-2s;--p:5s;--sp:25;--o:0.6;--c:var(--c-const)"><b>}</b></i><i style="--x:81%;--y:20%;--s:23px;--t:35s;--st:175;--sf:35;--d:-14s;--p:7s;--sp:35;--o:0.77;--c:var(--c-num)"><b>&lt;</b></i><i style="--x:73%;--y:79%;--s:24px;--t:35s;--st:175;--sf:35;--d:-35s;--p:6s;--sp:30;--o:0.77;--c:var(--c-num)"><b>&gt;</b></i><i style="--x:85%;--y:58%;--s:25px;--t:35s;--st:175;--sf:35;--d:-14s;--p:6s;--sp:30;--o:0.74;--c:var(--c-const)"><b>/</b></i><i style="--x:75%;--y:65%;--s:28px;--t:35s;--st:175;--sf:35;--d:-33s;--p:7s;--sp:35;--o:0.75;--c:var(--c-str)"><b>;</b></i><i style="--x:92%;--y:52%;--s:26px;--t:20s;--st:100;--sf:20;--d:-9s;--p:8s;--sp:40;--o:0.63;--c:var(--c-num)"><b>=</b></i><i style="--x:85%;--y:53%;--s:23px;--t:35s;--st:175;--sf:35;--d:-26s;--p:5s;--sp:25;--o:0.7;--c:var(--c-fn)"><b>}</b></i><i class="dot" style="--x:87%;--y:84%;--s:4px;--t:25s;--st:125;--sf:25;--d:-2s;--p:8s;--sp:40;--o:0.84;--c:var(--c-const)"><b></b></i><i class="dot" style="--x:83%;--y:12%;--s:4px;--t:30s;--st:150;--sf:30;--d:-1s;--p:9s;--sp:45;--o:0.64;--c:var(--c-num)"><b></b></i><i class="dot" style="--x:89%;--y:76%;--s:4px;--t:35s;--st:175;--sf:35;--d:-5s;--p:5s;--sp:25;--o:0.74;--c:var(--c-key)"><b></b></i><i class="dot" style="--x:80%;--y:51%;--s:4px;--t:35s;--st:175;--sf:35;--d:-13s;--p:7s;--sp:35;--o:0.78;--c:var(--c-fn)"><b></b></i></div>
-      <div class="gutter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="gutter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <main id="main">
 <section class="file" id="perfil" data-lang="Markdown" aria-labelledby="f-perfil">
   <p class="file-name" data-file="profile.md"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg><b>profile.md</b> · markdown</p>
-  <p class="prompt"><span class="ps">visitor@portfolio</span><span class="punc">:~$</span> <span class="typed">whoami</span><i class="caret" aria-hidden="true"></i></p>
+  <p class="prompt"><span class="ps">visitor@portfolio</span><span class="punc">:~$</span> <span class="typed" style="--ch:16">cat greeting.txt</span><i class="caret" aria-hidden="true"></i></p>
   <p class="mono rise" style="--i:1"><span class="cm">// hi, I'm</span></p>
   <h1 class="name" id="f-perfil"><span class="nm" data-text="Angel Saenz">Angel Saenz</span></h1>
   <p class="role rise" style="--i:2">// Backend Developer</p>
+  <ul class="stack-tags rise" style="--i:2" aria-label="Main stack"><li><span aria-hidden="true">// </span>Java / Spring Boot</li><li><span aria-hidden="true">// </span>AWS</li><li><span aria-hidden="true">// </span>Kubernetes</li><li><span aria-hidden="true">// </span>Angular</li><li><span aria-hidden="true">// </span>PostgreSQL</li></ul>
   <p class="lead">Backend developer based in Lima. I build microservices with Java and Spring Boot, work with AWS services and deploy on Kubernetes and Azure DevOps.</p>
   <div class="cta rise" style="--i:3">
-    <a class="btn primary" href="#contacto">Get in touch</a>
-    <a class="btn" href="case/esg-trazabilidad.html">View project</a>
-    <a class="btn" href="../assets/cv/CV_Angel_Saenz.pdf" target="_blank" rel="noopener noreferrer" aria-label="View CV (PDF, 295 KB) by Angel Saenz (opens in a new tab)">View CV <span class="sz">(PDF, 295 KB)</span><svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-ext"/></svg></a>
+    <a class="btn primary" href="#sobre-mi">About me</a>
+    <a class="btn" href="../assets/cv/CV_Angel_Saenz.pdf" target="_blank" rel="noopener noreferrer" aria-label="View CV (PDF, 295 KB) by Angel Saenz (opens in a new tab)"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-cv"/></svg><span>View CV <span class="sz">(PDF, 295 KB)</span></span></a>
   </div>
   <div class="links rise" style="--i:4">
-    <a class="tag" href="https://www.linkedin.com/in/saenzdev/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn of Angel Saenz (opens in a new tab)">LinkedIn<svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-ext"/></svg></a>
-    <a class="tag" href="https://github.com/Reedsy2407" target="_blank" rel="noopener noreferrer" aria-label="GitHub of Angel Saenz (opens in a new tab)">GitHub<svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-ext"/></svg></a>
-    <a class="tag" href="mailto:saenzvelarde2006@gmail.com">saenzvelarde2006@gmail.com</a>
+    <a class="tag" href="https://www.linkedin.com/in/saenzdev/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn of Angel Saenz (opens in a new tab)"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-linkedin"/></svg>LinkedIn</a>
+    <a class="tag" href="https://github.com/Reedsy2407" target="_blank" rel="noopener noreferrer" aria-label="GitHub of Angel Saenz (opens in a new tab)"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-github"/></svg>GitHub</a>
+    <a class="tag" id="copiar-correo" href="mailto:saenzvelarde2006@gmail.com" data-label="Copy email saenzvelarde2006@gmail.com" data-ok="Copied" data-fail="Could not copy"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg><span>saenzvelarde2006@gmail.com</span></a>
+    <a class="tag js-only" href="mailto:saenzvelarde2006@gmail.com">Write</a>
+    <span class="copiado" id="copiado" aria-live="polite"></span>
   </div>
   
   <div class="fm rise" style="--i:5">
@@ -119,47 +125,68 @@
       <li><span class="g"><span class="cm" aria-hidden="true">// </span>tools</span><span class="v">Git · Swagger/OpenAPI · Postman · Scrum</span></li>
     </ul></div></figure>
 </section>
-<section class="file" id="experiencia" data-lang="JSON" aria-labelledby="f-exp">
-  <p class="file-name" data-file="experience.json"><svg class="ic t-json" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg><b>experience.json</b> · json</p>
+<section class="file" id="experiencia" data-lang="Markdown" aria-labelledby="f-exp">
+  <p class="file-name" data-file="experience.md"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg><b>experience.md</b> · timeline</p>
   <h2 class="title-px" id="f-exp">Experience</h2>
-  <p class="mono"><span class="cm">// most recent first; end clients are not named</span></p>
-  <div class="json wide">
-    <p class="mono"><span class="punc" aria-hidden="true">[</span></p>
-    <ol>
-      <li><span class="punc" aria-hidden="true">{</span><dl><dt>company</dt><dd>HRF GROUP S.A.C.</dd><dt>role</dt><dd>Java backend developer</dd><dt>period</dt><dd>April 2026 – present (remote)</dd><dt>context</dt><dd>B2B e-commerce platform</dd><dt>work</dt><dd><ul class="facts"><li>Microservices on Java 21 and Spring Boot 3.x with hexagonal architecture.</li><li>Fixed pricing and promotion calculation bugs by tracing the root cause across layers.</li><li>Batch endpoints for bulk stock queries between microservices.</li><li>Multi-schema PostgreSQL and Liquibase.</li><li>QA deployments on Kubernetes with ArgoCD and controlled hotfixes.</li><li>Monitoring with Dynatrace, Azure DevOps and code reviews.</li></ul></dd></dl><span class="punc" aria-hidden="true">},</span></li>
-      <li><span class="punc" aria-hidden="true">{</span><dl><dt>company</dt><dd>HRF GROUP S.A.C.</dd><dt>role</dt><dd>Java backend developer on AWS</dd><dt>period</dt><dd>Dec 2025 – Mar 2026</dd><dt>context</dt><dd>education sector</dd><dt>work</dt><dd><ul class="facts"><li>Lambdas in Java 21 with hexagonal architecture.</li><li>S3 with secure download links.</li><li>Step Functions with execution logging in DynamoDB.</li><li>MySQL changes.</li></ul></dd></dl><span class="punc" aria-hidden="true">},</span></li>
-      <li><span class="punc" aria-hidden="true">{</span><dl><dt>company</dt><dd>HRF GROUP S.A.C.</dd><dt>role</dt><dd>Backend developer</dd><dt>period</dt><dd>Sep – Dec 2025</dd><dt>context</dt><dd>enterprise CRM</dd><dt>work</dt><dd><ul class="facts"><li>.NET Core and Python.</li><li>REST and GraphQL APIs.</li><li>Bulk CSV processing.</li><li>Repository and Unit of Work with Entity Framework.</li></ul></dd></dl><span class="punc" aria-hidden="true">},</span></li>
-      <li><span class="punc" aria-hidden="true">{</span><dl><dt>company</dt><dd>Hera Consulting SAC</dd><dt>role</dt><dd>Junior Java programmer analyst</dd><dt>period</dt><dd>July 2025 – present (part-time)</dd><dt>work</dt><dd><ul class="facts"><li>Enterprise applications in Java and Python (Spring MVC, JSP, Servlets).</li><li>Odoo modules with WhatsApp and AI integrations.</li><li>Oracle and PostgreSQL.</li><li>Angular and TypeScript.</li></ul></dd></dl><span class="punc" aria-hidden="true">},</span></li>
-      <li><span class="punc" aria-hidden="true">{</span><dl><dt>company</dt><dd>COMPIPRO</dd><dt>role</dt><dd>Internship</dd><dt>period</dt><dd>Feb – May 2025</dd><dt>work</dt><dd><ul class="facts"><li>Logistics, attendance and CRM modules.</li><li>Real-time chat with WebSockets (Workerman).</li><li>PHP, JavaScript and MVC.</li></ul></dd></dl><span class="punc" aria-hidden="true">}</span></li>
-    </ol>
-    <p class="mono"><span class="punc" aria-hidden="true">]</span></p>
-  </div>
+  <p class="mono"><span class="cm">// most recent first. For confidentiality I don't name end clients.</span></p>
+  <ol class="timeline">
+    <li class="job">
+      <p class="job-when">April 2026 – present · remote</p>
+      <h3 class="job-title">Java backend developer <span class="sep" aria-hidden="true">·</span> <span class="co">HRF GROUP S.A.C.</span></h3>
+      <p class="job-ctx">B2B e-commerce platform</p>
+      <ul class="job-facts"><li>Microservices on Java 21 and Spring Boot 3.x with hexagonal architecture.</li><li>Fixed pricing and promotion bugs by tracing the root cause across layers.</li><li>Batch endpoints for bulk stock queries between microservices.</li><li>QA deployments with ArgoCD, controlled hotfixes and Dynatrace monitoring.</li></ul>
+      <ul class="chips-tech" aria-label="Technologies"><li>Java 21</li><li>Spring Boot 3.x</li><li>PostgreSQL</li><li>Liquibase</li><li>Kubernetes</li><li>ArgoCD</li><li>Dynatrace</li><li>Azure DevOps</li></ul>
+    </li>
+    <li class="job">
+      <p class="job-when">Dec 2025 – Mar 2026</p>
+      <h3 class="job-title">Java backend developer on AWS <span class="sep" aria-hidden="true">·</span> <span class="co">HRF GROUP S.A.C.</span></h3>
+      <p class="job-ctx">education sector</p>
+      <ul class="job-facts"><li>Lambdas in Java 21 with hexagonal architecture.</li><li>S3 with secure download links.</li><li>Step Functions with execution logging in DynamoDB, and MySQL changes.</li></ul>
+      <ul class="chips-tech" aria-label="Technologies"><li>Java 21</li><li>AWS Lambda</li><li>S3</li><li>Step Functions</li><li>DynamoDB</li><li>MySQL</li></ul>
+    </li>
+    <li class="job">
+      <p class="job-when">Sep – Dec 2025</p>
+      <h3 class="job-title">Backend developer <span class="sep" aria-hidden="true">·</span> <span class="co">HRF GROUP S.A.C.</span></h3>
+      <p class="job-ctx">enterprise CRM</p>
+      <ul class="job-facts"><li>REST and GraphQL APIs in .NET Core and Python.</li><li>Bulk CSV processing.</li><li>Repository and Unit of Work with Entity Framework.</li></ul>
+      <ul class="chips-tech" aria-label="Technologies"><li>.NET Core</li><li>Python</li><li>REST</li><li>GraphQL</li><li>Entity Framework</li></ul>
+    </li>
+    <li class="job">
+      <p class="job-when">July 2025 – present · part-time</p>
+      <h3 class="job-title">Junior Java programmer analyst <span class="sep" aria-hidden="true">·</span> <span class="co">Hera Consulting SAC</span></h3>
+      
+      <ul class="job-facts"><li>Enterprise applications in Java and Python (Spring MVC, JSP, Servlets).</li><li>Odoo modules with WhatsApp and AI integrations.</li></ul>
+      <ul class="chips-tech" aria-label="Technologies"><li>Java</li><li>Python</li><li>Spring MVC</li><li>Odoo</li><li>Oracle</li><li>PostgreSQL</li><li>Angular</li><li>TypeScript</li></ul>
+    </li>
+    <li class="job">
+      <p class="job-when">Feb – May 2025</p>
+      <h3 class="job-title">Internship <span class="sep" aria-hidden="true">·</span> <span class="co">COMPIPRO</span></h3>
+      
+      <ul class="job-facts"><li>Logistics, attendance and CRM modules.</li><li>Real-time chat with WebSockets (Workerman).</li></ul>
+      <ul class="chips-tech" aria-label="Technologies"><li>PHP</li><li>JavaScript</li><li>MVC</li><li>WebSockets</li></ul>
+    </li>
+  </ol>
 </section>
-<section class="file" id="proyecto" data-lang="Markdown" aria-labelledby="f-pro">
-  <p class="file-name" data-file="esg-trazabilidad.md"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg><b>esg-trazabilidad.md</b> · featured project</p>
-  <h2 class="title-px" id="f-pro">Featured project</h2>
-  <p class="mono"><span class="cm"># esg-trazabilidad</span></p>
-  <p class="lead">An ESG traceability platform for formalized recyclers in Metropolitan Lima. It connects neighbors and companies with recycler associations and issues a digital PDF certificate.</p>
-  <figure class="win"><figcaption class="win-bar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span>entradas.sh</span></figcaption><div class="win-body"><div class="entry"><div><h3>demo-instantanea</h3><p>A simulated view inside this site, with simulated data and no network calls.</p></div><a class="btn primary" href="case/esg-trazabilidad.html#demo">Open the demo</a></div>
-    <div class="entry stack"><div><h3>sistema-real</h3><p>The deployed system, in a new tab.</p></div><p class="notice" id="aviso-sistema"><b>Notice:</b> it may take up to 1 minute to wake up (free hosting). The system itself offers a one-click demo account so you can sign in without registering. Meanwhile, the instant demo opens right away.</p><a aria-describedby="aviso-sistema" class="btn" href="https://esg-frontend-egcf.onrender.com" target="_blank" rel="noopener noreferrer" aria-label="Open the real system (opens in a new tab)">Open the real system<svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-ext"/></svg></a></div></div></figure>
-  <p><a href="case/esg-trazabilidad.html">Read the case study</a></p>
-  <p class="mono"><span class="cm">// other personal projects</span></p>
-  <figure class="win wide"><figcaption class="win-bar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span>other-projects.ts</span></figcaption><div class="win-body"><ul class="tags">
-      <li><span class="g"><span class="cm" aria-hidden="true">// </span>Portal Laboral</span><span class="v">Spring Boot · Spring Security con JWT · Angular · MySQL</span></li>
-      <li><span class="g"><span class="cm" aria-hidden="true">// </span>Helpcore</span><span class="v">microservices with API Gateway, authentication, config server and Redis notifications</span></li>
-    </ul></div></figure>
-</section>
-<section class="file sh" id="contacto" data-lang="Shell" aria-labelledby="f-con">
-  <p class="file-name" data-file="contacto.sh"><svg class="ic t-sh" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg><b>contacto.sh</b> · shell</p>
-  <h2 class="title-px" id="f-con">Shall we talk?</h2>
-  <p class="mono"><span class="cm">#!/bin/sh</span></p>
-  <p class="lead">Have a service to build or a team to reinforce?</p>
-  <p>Available for part-time freelance projects. I reply by email within 24–48 hours. Time zone: Lima (UTC−5).</p>
-  <p class="mono"><span class="cmd">echo</span> <span class="st">"email: </span><a href="mailto:saenzvelarde2006@gmail.com">saenzvelarde2006@gmail.com</a><span class="st">"</span></p>
-  <p class="mono"><span class="cmd">echo</span> <span class="st">"cv: </span><a href="../assets/cv/CV_Angel_Saenz.pdf" target="_blank" rel="noopener noreferrer" aria-label="CV_Angel_Saenz.pdf (PDF, 295 KB) (opens in a new tab)">CV_Angel_Saenz.pdf (PDF, 295 KB)</a><span class="st">"</span></p>
-  <p class="mono"><span class="cmd">open</span> <a href="https://www.linkedin.com/in/saenzdev/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn of Angel Saenz (opens in a new tab)">linkedin.com/in/saenzdev</a></p>
-  <p class="mono"><span class="cmd">open</span> <a href="https://github.com/Reedsy2407" target="_blank" rel="noopener noreferrer" aria-label="GitHub of Angel Saenz (opens in a new tab)">github.com/Reedsy2407</a></p>
-  <div class="cta"><a class="btn primary" href="mailto:saenzvelarde2006@gmail.com">Write by email</a><a class="btn" href="https://www.linkedin.com/in/saenzdev/" target="_blank" rel="noopener noreferrer" aria-label="Write on LinkedIn (opens in a new tab)">Write on LinkedIn</a><a class="btn" href="../assets/cv/CV_Angel_Saenz.pdf" target="_blank" rel="noopener noreferrer" aria-label="View CV (PDF, 295 KB) by Angel Saenz (opens in a new tab)">View CV <span class="sz">(PDF, 295 KB)</span><svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-ext"/></svg></a></div>
+<section class="file" id="proyectos" data-lang="Markdown" aria-labelledby="f-pro">
+  <p class="file-name" data-file="projects.md"><svg class="ic t-md" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg><b>projects.md</b> · featured and personal projects</p>
+  <h2 class="title-px" id="f-pro">Projects</h2>
+  <article class="project wide" aria-labelledby="p-esg">
+    <h3 id="p-esg">esg-trazabilidad</h3>
+    <p class="project-meta">Academic project (EFSRT, CIBERTEC) · September – October 2026</p>
+    <p>An ESG traceability platform for formalized recyclers in Metropolitan Lima. It connects neighbors and companies with recycler associations and issues a digital PDF certificate. It has four services on Java 21 and Spring Boot 3.3.5 with hexagonal architecture, the Outbox/Inbox pattern and Liquibase, plus an Angular frontend.</p>
+    <ul class="chips-tech" aria-label="Technologies"><li>Java 21</li><li>Spring Boot 3.3.5</li><li>Angular</li><li>PostgreSQL</li><li>Liquibase</li><li>Render</li><li>Neon</li><li>CloudAMQP</li></ul>
+    <p class="notice" id="aviso-sistema"><b>Notice:</b> it may take up to 1 minute to wake up (free hosting). The system itself offers a one-click demo account so you can sign in without registering.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://esg-frontend-egcf.onrender.com" target="_blank" rel="noopener noreferrer" aria-label="Open the real system of esg-trazabilidad (opens in a new tab)" aria-describedby="aviso-sistema">Open the real system<svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-ext"/></svg></a>
+      <a class="btn" href="https://github.com/Reedsy2407/esg-trazabilidad" target="_blank" rel="noopener noreferrer" aria-label="Code of esg-trazabilidad (opens in a new tab)"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-github"/></svg>Code</a>
+      <a class="btn" href="https://reedsy2407.github.io/esg-trazabilidad/" target="_blank" rel="noopener noreferrer" aria-label="Documentation of esg-trazabilidad (opens in a new tab)"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-file"/></svg>Documentation</a>
+    </div>
+  </article>
+  <h3 class="sub">Personal projects</h3>
+  <ul class="plain dec own">
+    <li><strong>Portal Laboral</strong>Spring Boot, Spring Security with JWT, Angular and MySQL.</li>
+    <li><strong>Helpcore</strong>Microservices with API Gateway, authentication, config server and Redis notifications.</li>
+  </ul>
 </section>
       </main>
       <div class="minimap" aria-hidden="true"><div class="mm"><i style="--w:41%;--x:10%;--c:var(--c-fn)"></i><i style="--w:73%;--x:20%;--c:var(--ink-soft)"></i><i style="--w:37%;--x:0%;--c:var(--c-num)"></i><i style="--w:27%;--x:0%;--c:var(--c-const)"></i><i style="--w:66%;--x:0%;--c:var(--c-kw)"></i><i style="--w:74%;--x:0%;--c:var(--c-str)"></i><i style="--w:0%;--x:20%;--c:var(--c-const)"></i><i style="--w:71%;--x:20%;--c:var(--ink-soft)"></i><i style="--w:33%;--x:10%;--c:var(--c-key)"></i><i style="--w:42%;--x:20%;--c:var(--c-str)"></i><i style="--w:57%;--x:10%;--c:var(--ink-soft)"></i><i style="--w:58%;--x:10%;--c:var(--c-fn)"></i><i style="--w:57%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:54%;--x:10%;--c:var(--ink-soft)"></i><i style="--w:29%;--x:20%;--c:var(--ink-soft)"></i><i style="--w:0%;--x:20%;--c:var(--c-fn)"></i><i style="--w:39%;--x:10%;--c:var(--c-fn)"></i><i style="--w:38%;--x:0%;--c:var(--c-num)"></i><i style="--w:68%;--x:20%;--c:var(--c-key)"></i><i style="--w:39%;--x:0%;--c:var(--c-str)"></i><i style="--w:28%;--x:20%;--c:var(--c-kw)"></i><i style="--w:71%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:68%;--x:10%;--c:var(--ink-soft)"></i><i style="--w:31%;--x:20%;--c:var(--ink-soft)"></i><i style="--w:58%;--x:20%;--c:var(--c-const)"></i><i style="--w:37%;--x:10%;--c:var(--c-type)"></i><i style="--w:77%;--x:20%;--c:var(--c-const)"></i><i style="--w:57%;--x:20%;--c:var(--c-key)"></i><i style="--w:74%;--x:20%;--c:var(--ink-soft)"></i><i style="--w:44%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:70%;--x:0%;--c:var(--c-str)"></i><i style="--w:58%;--x:10%;--c:var(--c-const)"></i><i style="--w:62%;--x:0%;--c:var(--c-key)"></i><i style="--w:63%;--x:0%;--c:var(--c-key)"></i><i style="--w:59%;--x:10%;--c:var(--c-const)"></i><i style="--w:79%;--x:0%;--c:var(--c-fn)"></i><i style="--w:58%;--x:20%;--c:var(--c-num)"></i><i style="--w:51%;--x:10%;--c:var(--c-type)"></i><i style="--w:74%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:29%;--x:20%;--c:var(--c-fn)"></i><i style="--w:0%;--x:10%;--c:var(--c-kw)"></i><i style="--w:37%;--x:0%;--c:var(--c-fn)"></i><i style="--w:61%;--x:0%;--c:var(--c-num)"></i><i style="--w:33%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:49%;--x:20%;--c:var(--ink-soft)"></i><i style="--w:0%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:28%;--x:20%;--c:var(--c-str)"></i><i style="--w:43%;--x:10%;--c:var(--c-const)"></i><i style="--w:58%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:66%;--x:10%;--c:var(--ink-soft)"></i><i style="--w:66%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:37%;--x:0%;--c:var(--c-kw)"></i><i style="--w:55%;--x:20%;--c:var(--c-num)"></i><i style="--w:53%;--x:10%;--c:var(--c-const)"></i><i style="--w:63%;--x:20%;--c:var(--c-const)"></i><i style="--w:73%;--x:20%;--c:var(--c-const)"></i><i style="--w:27%;--x:20%;--c:var(--ink-soft)"></i><i style="--w:27%;--x:20%;--c:var(--ink-soft)"></i><i style="--w:71%;--x:0%;--c:var(--c-num)"></i><i style="--w:28%;--x:10%;--c:var(--ink-soft)"></i><i style="--w:68%;--x:20%;--c:var(--c-key)"></i><i style="--w:55%;--x:10%;--c:var(--ink-soft)"></i><i style="--w:54%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:0%;--x:0%;--c:var(--c-key)"></i><i style="--w:79%;--x:10%;--c:var(--c-const)"></i><i style="--w:76%;--x:10%;--c:var(--c-num)"></i><i style="--w:51%;--x:20%;--c:var(--c-num)"></i><i style="--w:66%;--x:20%;--c:var(--c-type)"></i><i style="--w:27%;--x:0%;--c:var(--c-fn)"></i><i style="--w:59%;--x:0%;--c:var(--ink-soft)"></i><i style="--w:0%;--x:20%;--c:var(--c-num)"></i><i style="--w:43%;--x:20%;--c:var(--c-num)"></i><i style="--w:31%;--x:20%;--c:var(--c-kw)"></i><i style="--w:39%;--x:20%;--c:var(--c-const)"></i><i style="--w:63%;--x:10%;--c:var(--c-fn)"></i><i style="--w:69%;--x:10%;--c:var(--ink-soft)"></i><i style="--w:80%;--x:20%;--c:var(--c-fn)"></i><i style="--w:0%;--x:10%;--c:var(--ink-soft)"></i><i style="--w:60%;--x:0%;--c:var(--c-kw)"></i><i style="--w:66%;--x:0%;--c:var(--ink-soft)"></i><div class="mm-view"></div></div></div>
@@ -180,7 +207,7 @@
 <dialog id="cmd" aria-labelledby="cmd-t">
   <h2 id="cmd-t">Go to file</h2>
   <input type="search" aria-label="Filter files" placeholder="type to filter">
-  <ul><li><a href="#perfil">profile.md</a></li><li><a href="#sobre-mi">about.md</a></li><li><a href="#habilidades">skills.ts</a></li><li><a href="#experiencia">experience.json</a></li><li><a href="#proyecto">esg-trazabilidad.md</a></li><li><a href="#contacto">contacto.sh</a></li><li><a href="case/esg-trazabilidad.html">esg-trazabilidad/</a></li></ul>
+  <ul><li><a href="#perfil">profile.md</a></li><li><a href="#sobre-mi">about.md</a></li><li><a href="#habilidades">skills.ts</a></li><li><a href="#experiencia">experience.md</a></li><li><a href="#proyectos">projects.md</a></li></ul>
 </dialog>
 </body>
 </html>

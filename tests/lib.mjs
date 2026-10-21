@@ -10,9 +10,7 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 /** Todas las páginas del sitio, con el idioma y el tipo que la prueba necesita saber. */
 export const PAGES = [
   { path: '/index.html', lang: 'es', kind: 'home' },
-  { path: '/caso/esg-trazabilidad.html', lang: 'es', kind: 'caso' },
   { path: '/en/index.html', lang: 'en', kind: 'home' },
-  { path: '/en/case/esg-trazabilidad.html', lang: 'en', kind: 'caso' },
   { path: '/404.html', lang: 'es', kind: '404' },
 ];
 
@@ -76,7 +74,7 @@ export function createReport() {
 }
 
 /** Atajos de contexto: tamaños y esquemas que usan las pruebas. */
-export const VIEWPORTS = { m: { width: 360, height: 740 }, d: { width: 1280, height: 800 }, w: { width: 1920, height: 1080 } };
+export const VIEWPORTS = { m: { width: 360, height: 740 }, t: { width: 768, height: 1024 }, d: { width: 1280, height: 800 }, w: { width: 1920, height: 1080 } };
 
 export async function open(browser, base, path, { viewport = VIEWPORTS.d, scheme = 'dark', reduced = 'no-preference', js = true, init } = {}) {
   const context = await browser.newContext({ viewport, colorScheme: scheme, reducedMotion: reduced, javaScriptEnabled: js, locale: 'es-PE' });

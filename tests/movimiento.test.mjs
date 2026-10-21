@@ -65,9 +65,6 @@ export async function run({ browser, base, report }) {
       r.fx === 'none' && r.glitch === 'none' && r.typed === 'none' && r.caret === 'none' && r.rise === 'none', JSON.stringify({ fx: r.fx, glitch: r.glitch, typed: r.typed, caret: r.caret, rise: r.rise }));
     report.check('movimiento reducido: el contenido se ve entero desde el primer cuadro', r.lead === 1 && r.h1 === 1);
     await context.close();
-    const cc = await open(browser, base, '/caso/esg-trazabilidad.html', { reduced: 'reduce' });
-    report.check('movimiento reducido: en la demo no queda ninguna animación en curso', (await cc.page.evaluate(`(${ANIM})()`)).infinitas === 0);
-    await cc.context.close();
   }
 
   // Sin interruptor de efectos: no hay botón ni estado guardado; el apagado es solo por prefers-reduced-motion.

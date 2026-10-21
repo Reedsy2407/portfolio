@@ -1,5 +1,5 @@
-// Contenido: legible sin JavaScript, enlaces externos con rel correcto, aviso del sistema real, demo sin red,
-// semántica básica y reglas de estilo del brief (sin degradados, sin backdrop-filter, sin emoji, solo opacity/transform).
+// Contenido: legible sin JavaScript, enlaces externos con rel correcto, aviso del sistema real, semántica básica
+// y reglas de estilo del brief (sin degradados, sin backdrop-filter, sin emoji, solo opacity/transform).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PAGES, ROOT, VIEWPORTS, open } from './lib.mjs';
@@ -10,87 +10,61 @@ const DISPONIBLE = {
   es: 'Disponible para proyectos freelance a tiempo parcial. Respondo por correo en 24 a 48 horas. Zona horaria: Lima (UTC−5).',
   en: 'Available for part-time freelance projects. I reply by email within 24–48 hours. Time zone: Lima (UTC−5).',
 };
-const PERIODO_CASO = { es: 'Proyecto académico (EFSRT, CIBERTEC) · septiembre – octubre 2026', en: 'Academic project (EFSRT, CIBERTEC) · September – October 2026' };
+const PERIODO_PROYECTO = { es: 'Proyecto académico (EFSRT, CIBERTEC) · septiembre – octubre 2026', en: 'Academic project (EFSRT, CIBERTEC) · September – October 2026' };
 const AVISO = { es: 'puede tardar hasta 1 minuto en despertar (hosting gratuito)', en: 'may take up to 1 minute to wake up (free hosting)' };
 const ESPERADO = {
-  es: {
-    home: ['Angel Saenz', '// Backend Developer', 'Java 21', 'Spring Boot', 'Kubernetes', 'Azure DevOps', 'HRF GROUP S.A.C.', 'Hera Consulting SAC', 'COMPIPRO', 'plataforma de e-commerce B2B', 'sector educación', 'CRM empresarial', 'Cibertec', 'EF SET 64/100', 'Scrum Fundamentals Certified', 'saenzvelarde2006@gmail.com', 'Portal Laboral', 'Helpcore', 'cuenta demo de un clic'],
-    caso: ['esg-trazabilidad', 'recicladores formalizados de Lima Metropolitana', 'certificado digital en PDF', 'Spring Boot 3.3.5', 'hexagonal', 'Outbox/Inbox', 'Liquibase', 'Angular', 'Render', 'Neon', 'CloudAMQP', 'datos simulados', 'sin validez legal', 'saenzvelarde2006@gmail.com', 'R-012'],
-  },
-  en: {
-    home: ['Angel Saenz', '// Backend Developer', 'Java 21', 'Kubernetes', 'HRF GROUP S.A.C.', 'Hera Consulting SAC', 'COMPIPRO', 'B2B e-commerce platform', 'education sector', 'enterprise CRM', 'Cibertec', 'EF SET 64/100', 'Scrum Fundamentals Certified', 'saenzvelarde2006@gmail.com', 'Portal Laboral', 'Helpcore'],
-    caso: ['esg-trazabilidad', 'formalized recyclers in Metropolitan Lima', 'digital PDF certificate', 'Outbox/Inbox', 'simulated data', 'saenzvelarde2006@gmail.com', 'R-012'],
-  },
+  es: ['Angel Saenz', '// Backend Developer', 'Java 21', 'Spring Boot', 'Kubernetes', 'Azure DevOps', 'HRF GROUP S.A.C.', 'Hera Consulting SAC', 'COMPIPRO', 'plataforma de e-commerce B2B', 'sector educación', 'CRM empresarial', 'Cibertec', 'EF SET 64/100', 'Scrum Fundamentals Certified', 'saenzvelarde2006@gmail.com', 'Portal Laboral', 'Helpcore', 'cuenta demo de un clic', 'recicladores formalizados de Lima Metropolitana', 'certificado digital en PDF', 'Spring Boot 3.3.5', 'Outbox/Inbox', 'Liquibase'],
+  en: ['Angel Saenz', '// Backend Developer', 'Java 21', 'Kubernetes', 'HRF GROUP S.A.C.', 'Hera Consulting SAC', 'COMPIPRO', 'B2B e-commerce platform', 'education sector', 'enterprise CRM', 'Cibertec', 'EF SET 64/100', 'Scrum Fundamentals Certified', 'saenzvelarde2006@gmail.com', 'Portal Laboral', 'Spring Security with JWT', 'Helpcore', 'formalized recyclers in Metropolitan Lima', 'digital PDF certificate', 'Outbox/Inbox'],
 };
-const EXTERNOS = {
-  home: ['https://www.linkedin.com/in/saenzdev/', 'https://github.com/Reedsy2407', 'https://esg-frontend-egcf.onrender.com'],
-  caso: ['https://www.linkedin.com/in/saenzdev/', 'https://github.com/Reedsy2407', 'https://esg-frontend-egcf.onrender.com', 'https://reedsy2407.github.io/esg-trazabilidad/', 'https://github.com/Reedsy2407/esg-trazabilidad'],
-};
+const EXTERNOS = [
+  'https://www.linkedin.com/in/saenzdev/', 'https://github.com/Reedsy2407', 'https://esg-frontend-egcf.onrender.com',
+  'https://reedsy2407.github.io/esg-trazabilidad/', 'https://github.com/Reedsy2407/esg-trazabilidad',
+];
 
 export async function run({ browser, base, report }) {
-  for (const p of PAGES.filter((x) => x.kind !== '404')) {
+  const portadas = PAGES.filter((x) => x.kind === 'home');
+
+  for (const p of portadas) {
     // Sin JavaScript: todo el texto del contenido está presente y a la vista.
     const { context, page } = await open(browser, base, p.path, { js: false, viewport: VIEWPORTS.d });
     const texto = await page.evaluate(() => document.querySelector('main').innerText.replace(/\s+/g, ' '));
-    const faltan = [...ESPERADO[p.lang][p.kind], AVISO[p.lang], DISPONIBLE[p.lang], ...(p.kind === 'caso' ? [PERIODO_CASO[p.lang]] : [])].filter((x) => !texto.includes(x));
+    const faltan = [...ESPERADO[p.lang], AVISO[p.lang], DISPONIBLE[p.lang], PERIODO_PROYECTO[p.lang]].filter((x) => !texto.includes(x));
     report.check(`${p.path} sin JavaScript: el contenido se lee entero`, faltan.length === 0, faltan.join(' | '));
     const ocultos = await page.evaluate(() => [...document.querySelectorAll('main section')].filter((s) => s.getBoundingClientRect().height < 50 || getComputedStyle(s).visibility === 'hidden').map((s) => s.id));
+    const marcasEs = p.lang === 'en' ? (texto.match(/(con|para|más|las|los|una|del|sin|de la)/g) || []) : [];
+    report.check(`${p.path}: la traducción no deja palabras en español`, marcasEs.length === 0, marcasEs.join(', '));
     report.check(`${p.path} sin JavaScript: todas las secciones visibles`, ocultos.length === 0, ocultos.join(', '));
-    if (p.kind === 'caso') {
-      const filas = await page.evaluate(() => [...document.querySelectorAll('#demo-tabla tbody tr')].filter((r) => r.getBoundingClientRect().height > 0).length);
-      report.check(`${p.path} sin JavaScript: la demo muestra sus 12 filas`, filas === 12, String(filas));
-    }
     await context.close();
   }
 
-  for (const p of PAGES.filter((x) => x.kind !== '404')) {
+  for (const p of portadas) {
     const { context, page } = await open(browser, base, p.path, { viewport: VIEWPORTS.d });
     const info = await page.evaluate(() => {
       const ext = [...document.querySelectorAll('a[href^="http"]')].map((a) => ({ href: a.href, target: a.target, rel: a.rel, label: a.getAttribute('aria-label') || '' }));
-      const sistema = document.querySelector('a[href^="https://esg-frontend-egcf"]');
+      const sistema = document.querySelector('a[href^="https://esg-frontend"]');
       const aviso = document.getElementById('aviso-sistema');
       const visible = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
       return {
-        ext: ext.filter((a) => !a.href.startsWith('mailto:')), mailtos: [...document.querySelectorAll('a[href^="mailto:"]')].map((a) => a.getAttribute('href')), correoVisible: [...document.querySelectorAll('a[href^="mailto:"]')].some((a) => { const r = a.getBoundingClientRect(); return r.width > 0 && r.height > 0; }),
+        ext,
         avisoAntes: Boolean(aviso && sistema && (aviso.compareDocumentPosition(sistema) & Node.DOCUMENT_POSITION_FOLLOWING)),
         avisoVisible: aviso ? visible(aviso) : false, describe: sistema ? sistema.getAttribute('aria-describedby') : null,
         h1: document.querySelectorAll('h1').length, landmarks: ['header', 'nav', 'main', 'footer'].every((t) => document.querySelector(t)),
-        roles: document.querySelectorAll('[role=tab], [role=tablist]').length, ariaHiddenDeco: ['.fx', '.gutter', '.minimap', '.curline', '.lights'].every((s) => [...document.querySelectorAll(s)].every((e) => e.closest('[aria-hidden="true"]'))),
-        emoji: /\p{Extended_Pictographic}/u.test(document.body.innerText), lang: document.documentElement.lang,
+        roles: document.querySelectorAll('[role=tab], [role=tablist]').length,
+        ariaHiddenDeco: ['.fx', '.gutter', '.minimap', '.curline', '.lights'].every((s) => [...document.querySelectorAll(s)].every((e) => e.closest('[aria-hidden="true"]'))),
+        emoji: /\p{Extended_Pictographic}/u.test(document.body.innerText),
+        pendientes: [...document.querySelectorAll('.todo')].map((e) => e.textContent),
+        mailtos: [...document.querySelectorAll('a[href^="mailto:"]')].map((a) => a.getAttribute('href')),
       };
     });
     const mal = info.ext.filter((a) => a.target !== '_blank' || !/noopener/.test(a.rel) || !/noreferrer/.test(a.rel));
     report.check(`${p.path}: enlaces externos con target=_blank y rel="noopener noreferrer"`, info.ext.length > 0 && mal.length === 0, mal.map((a) => a.href).join(', '));
-    const faltan = EXTERNOS[p.kind].filter((h) => !info.ext.some((a) => a.href === h || a.href === h + '/'));
+    const faltan = EXTERNOS.filter((h) => !info.ext.some((a) => a.href === h || a.href === h + '/'));
     report.check(`${p.path}: enlaces esperados presentes`, faltan.length === 0, faltan.join(', '));
     report.check(`${p.path}: los enlaces externos avisan de la pestaña nueva`, info.ext.every((a) => /pestaña nueva|new tab/.test(a.label)), '');
     report.check(`${p.path}: aviso de despertar visible y antes del botón del sistema real`, info.avisoAntes && info.avisoVisible && info.describe === 'aviso-sistema');
-    const pend = await page.evaluate(() => ({
-      fuera: [...document.querySelectorAll('.todo')].filter((e) => !e.closest('#resultados')).map((e) => e.textContent),
-      enResultados: document.querySelectorAll('#resultados .todo').length,
-      dispEnContacto: document.querySelector('#contacto').innerText.includes('UTC−5'),
-      rolCaso: [...document.querySelectorAll('.fm dt')].some((d) => /^(rol|role):/.test(d.textContent)) && Boolean(document.querySelector('#resumen')),
-    }));
-    report.check(`${p.path}: ningún marcador «por confirmar» visible salvo los de resultados`, pend.fuera.length === 0 && (p.kind === 'caso' ? pend.enResultados === 2 : true), JSON.stringify(pend));
-    report.check(`${p.path}: la disponibilidad está en el contacto y no hay línea de rol en el caso`, pend.dispEnContacto && !pend.rolCaso);
-    report.check(`${p.path}: un único correo, con enlace mailto y visible`, info.mailtos.length > 0 && info.mailtos.every((m) => m === 'mailto:saenzvelarde2006@gmail.com') && info.correoVisible, info.mailtos.join(', '));
+    report.check(`${p.path}: un único correo, con enlace mailto`, info.mailtos.length > 0 && info.mailtos.every((m) => m === 'mailto:saenzvelarde2006@gmail.com'), info.mailtos.join(', '));
     report.check(`${p.path}: un h1, landmarks, sin roles inventados, decoración aria-hidden, sin emoji`, info.h1 === 1 && info.landmarks && info.roles === 0 && info.ariaHiddenDeco && !info.emoji, JSON.stringify({ h1: info.h1, lm: info.landmarks, roles: info.roles, deco: info.ariaHiddenDeco, emoji: info.emoji }));
-
-    // Sin peticiones de calentamiento ni de red desde la demo: cero peticiones tras la carga, aun usando los filtros.
-    if (p.kind === 'caso') {
-      await page.waitForLoadState('networkidle');
-      const nuevas = [];
-      page.on('request', (r) => nuevas.push(r.url()));
-      for (const f of ['programado', 'certificado', 'todos']) await page.click(`[data-filtro="${f}"]`);
-      const resumen = await page.textContent('#demo-resumen');
-      const filas = await page.evaluate(() => [...document.querySelectorAll('#demo-tabla tbody tr')].filter((r) => !r.hidden).length);
-      report.check(`${p.path}: la demo filtra sin red y recalcula el resumen`, nuevas.length === 0 && filas === 12 && /12/.test(resumen), `${nuevas.length} peticiones; ${resumen}`);
-      await page.click('[data-filtro="recogido"]');
-      const r2 = await page.evaluate(() => ({ filas: [...document.querySelectorAll('#demo-tabla tbody tr')].filter((r) => !r.hidden).length, txt: document.getElementById('demo-resumen').textContent }));
-      report.check(`${p.path}: el filtro «recogido» deja 3 filas y 1 162 kg`, r2.filas === 3 && /1 162/.test(r2.txt) && nuevas.length === 0, `${r2.filas} filas; ${r2.txt}`);
-      const tabla = await page.evaluate(() => { const w = document.getElementById('demo-tabla'); return { tab: w.tabIndex, role: w.getAttribute('role'), lbl: w.getAttribute('aria-labelledby') }; });
-      report.check(`${p.path}: tabla en región con foco de teclado y nombre`, tabla.tab === 0 && tabla.role === 'region' && Boolean(tabla.lbl));
-    }
+    report.check(`${p.path}: ningún marcador «por confirmar» visible`, info.pendientes.length === 0, info.pendientes.join(', '));
     await context.close();
   }
 

@@ -1,6 +1,6 @@
 /* Mejora progresiva del marco «Editor». Sin dependencias. Sin JavaScript todo el contenido se lee igual:
    esto añade tema, scrollspy, línea actual, minimapa, menú móvil, paleta de comandos,
-   el filtro de la demo y la barra de estado con datos reales (errores contados, carga y LCP medidos, línea y
+   el botón de copiar el correo y la barra de estado con datos reales (errores contados, carga y LCP medidos, línea y
    columna según scroll y puntero). */
 (() => {
   'use strict';
@@ -151,27 +151,45 @@
     dlg.addEventListener('click', (e) => { if (e.target === dlg || e.target.closest('a')) dlg.close(); });
   }
 
-  /* Demo con datos simulados: filtra las filas por estado y recalcula el resumen. Sin red. */
-  const demo = $('#demo-tabla');
-  if (demo) {
-    const chips = $$('[data-filtro]');
-    const trs = $$('tbody tr', demo);
-    const sum = $('#demo-resumen');
-    const thin = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    const apply = (f) => {
-      let n = 0;
-      let kg = 0;
-      trs.forEach((tr) => {
-        const on = f === 'todos' || tr.dataset.estado === f;
-        tr.hidden = !on;
-        if (on) { n++; kg += Number(tr.dataset.kg); }
-      });
-      chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.filtro === f)));
-      if (sum) sum.textContent = sum.dataset.tpl.replace('{n}', n).replace('{kg}', thin(kg));
+  /* Correo: sin JavaScript es un enlace mailto; aquí pasa a copiar la dirección y avisa con «Copiado». */
+  const mail = $('#copiar-correo');
+  const aviso = $('#copiado');
+  if (mail && aviso) {
+    const address = mail.querySelector('span').textContent;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = mail.className;
+    btn.id = mail.id;
+    btn.innerHTML = mail.innerHTML;
+    btn.setAttribute('aria-label', mail.dataset.label);
+    let timer;
+    const say = (msg) => {
+      aviso.textContent = msg;
+      aviso.classList.add('on');
+      clearTimeout(timer);
+      timer = setTimeout(() => { aviso.textContent = ''; aviso.classList.remove('on'); }, 3000);
     };
-    chips.forEach((c) => { c.hidden = false; c.addEventListener('click', () => apply(c.dataset.filtro)); });
-    const bar = $('#demo-filtros');
-    if (bar) bar.hidden = false;
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = address;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch {}
+      ta.remove();
+      return ok;
+    };
+    btn.addEventListener('click', async () => {
+      let ok = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        try { await navigator.clipboard.writeText(address); ok = true; } catch {}
+      }
+      if (!ok) ok = fallback();
+      say(ok ? mail.dataset.ok : mail.dataset.fail);
+    });
+    mail.replaceWith(btn);
   }
 
   /* Errores contados de verdad: scripts, recursos que no cargan (captura en window desde el <head>),

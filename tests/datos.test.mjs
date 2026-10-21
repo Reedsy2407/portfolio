@@ -14,7 +14,7 @@ export async function run({ browser, base, report }) {
   const hay = existsSync(CV);
   report.info('CV', hay ? `assets/cv/CV_Angel_Saenz.pdf existe (${(statSync(CV).size / 1024).toFixed(0)} KB)` : 'assets/cv/CV_Angel_Saenz.pdf no existe: se espera el marcador «[CV por confirmar]» sin enlace');
 
-  for (const p of PAGES.filter((x) => x.kind === 'home' || x.kind === 'caso')) {
+  for (const p of PAGES.filter((x) => x.kind === 'home')) {
     const { context, page } = await open(browser, base, p.path, { viewport: VIEWPORTS.d });
     const cv = await page.evaluate(() => {
       const enlaces = [...document.querySelectorAll('a[href*="CV_Angel_Saenz"]')].map((a) => ({

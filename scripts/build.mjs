@@ -20,8 +20,8 @@ const CORREO = 'saenzvelarde2006@gmail.com';
 
 /* Rutas de cada página, relativas a la raíz del sitio. */
 const PAGES = {
-  es: { home: 'index.html', caso: 'caso/esg-trazabilidad.html' },
-  en: { home: 'en/index.html', caso: 'en/case/esg-trazabilidad.html' },
+  es: { home: 'index.html' },
+  en: { home: 'en/index.html' },
 };
 
 const UI = {
@@ -30,14 +30,14 @@ const UI = {
     langLabel: 'Idioma', explorer: 'Explorador', navFiles: 'Archivos del portafolio', tabs: 'Archivos abiertos',
     search: 'Buscar archivo (Ctrl K)', statusBar: 'Barra de estado', errors: 'errores: ', goTo: 'Ir a un archivo',
     filter: 'Filtrar archivos', type: 'escribe para filtrar',
-    newTab: '(se abre en una pestaña nueva)', user: 'visitante@portafolio', todo: '[por confirmar]',
+    newTab: '(se abre en una pestaña nueva)', user: 'visitante@portafolio',
   },
   en: {
     lang: 'en', skip: 'Skip to content', files: 'Files', themeA: 'Light theme', themeB: 'Dark theme',
     langLabel: 'Language', explorer: 'Explorer', navFiles: 'Portfolio files', tabs: 'Open files',
     search: 'Find file (Ctrl K)', statusBar: 'Status bar', errors: 'errors: ', goTo: 'Go to file',
     filter: 'Filter files', type: 'type to filter',
-    newTab: '(opens in a new tab)', user: 'visitor@portfolio', todo: '[to be confirmed]',
+    newTab: '(opens in a new tab)', user: 'visitor@portfolio',
   },
 };
 
@@ -54,6 +54,10 @@ const SYMBOLS = `<svg width="0" height="0" style="position:absolute" aria-hidden
 <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
 <symbol id="i-error" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></symbol>
 <symbol id="i-ext" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></symbol>
+<symbol id="i-linkedin" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 11v6M8 7.5v.5M12 17v-6M12 13.5a3 3 0 0 1 6 0V17"/></symbol>
+<symbol id="i-github" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.6 8.4L8 6.4l2.2 1.3h3.6L16 6.4l-.6 2a3.6 3.6 0 0 1 .7 2.2c0 2.2-1.7 3.4-4.1 3.4s-4.1-1.2-4.1-3.4c0-.8.2-1.6.7-2.2zM10 18v-2.5M14 18v-2.5"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 7.5L12 13l8.5-5.5"/></symbol>
+<symbol id="i-cv" viewBox="0 0 24 24"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM14 3v4h4M9 12h6M9 16h4"/></symbol>
 </defs></svg>`;
 
 const ic = (id, size, cls = '') =>
@@ -191,77 +195,48 @@ ${sections.join('\n')}
 }
 
 /* ── Piezas de contenido ───────────────────────────── */
-const fileHead = (lang, id, name, type, label) =>
+const fileHead = (name, type, label) =>
   `  <p class="file-name" data-file="${name}">${ic('i-file', 18, 't-' + type)}<b>${name}</b> · ${label}</p>`;
 const section = (id, name, type, mode, label, labelledby, body, cls = '') =>
-  `<section class="file${cls ? ' ' + cls : ''}" id="${id}" data-lang="${mode}" aria-labelledby="${labelledby}">\n${fileHead('', id, name, type, label)}\n${body}\n</section>`;
-const win = (name, inner, wide = true, extraBar = '') =>
-  `<figure class="win${wide ? ' wide' : ''}"><figcaption class="win-bar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span>${name}</span>${extraBar}</figcaption><div class="win-body">${inner}</div></figure>`;
-const ext = (href, label, text, lang, cls = '') =>
-  `<a${cls ? ` class="${cls}"` : ''} href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${label} ${UI[lang].newTab}">${text}</a>`;
-const chip = (href, name, label, lang) =>
-  ext(href, `${label} ${t(lang, 'de', 'of')} ${NOMBRE}`, `${name}${ic('i-ext', 16)}`, lang, 'tag');
-const todo = (lang) => `<span class="todo">${UI[lang].todo}</span>`;
+  `<section class="file${cls ? ' ' + cls : ''}" id="${id}" data-lang="${mode}" aria-labelledby="${labelledby}">\n${fileHead(name, type, label)}\n${body}\n</section>`;
+const win = (name, inner, wide = true) =>
+  `<figure class="win${wide ? ' wide' : ''}"><figcaption class="win-bar"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span>${name}</span></figcaption><div class="win-body">${inner}</div></figure>`;
+/* Enlace externo: pestaña nueva y nombre accesible que empieza por el texto visible (WCAG 2.5.3). */
+const ext = (href, label, inner, lang, cls = '', extra = '') =>
+  `<a${cls ? ` class="${cls}"` : ''} href="${href}" target="_blank" rel="noopener noreferrer" aria-label="${label} ${UI[lang].newTab}"${extra}>${inner}</a>`;
 const row = (g, v) => `<li><span class="g"><span class="cm" aria-hidden="true">// </span>${g}</span><span class="v">${v}</span></li>`;
-
-/* Entradas del proyecto: demo instantánea y sistema real, con el aviso antes del botón. */
-function entradas(lang, demoHref) {
-  const sistemaLabel = t(lang, 'Abrir el sistema real', 'Open the real system');
-  const aviso = t(lang,
-    '<b>Aviso:</b> puede tardar hasta 1 minuto en despertar (hosting gratuito). El propio sistema ofrece una cuenta demo de un clic para entrar sin registrarte. Mientras tanto, la demo instantánea abre al momento.',
-    '<b>Notice:</b> it may take up to 1 minute to wake up (free hosting). The system itself offers a one-click demo account so you can sign in without registering. Meanwhile, the instant demo opens right away.');
-  return win('entradas.sh', `<div class="entry"><div><h3>demo-instantanea</h3><p>${t(lang, 'Vista simulada dentro de este sitio, con datos simulados y sin llamadas de red.', 'A simulated view inside this site, with simulated data and no network calls.')}</p></div><a class="btn primary" href="${demoHref}">${t(lang, 'Abrir la demo', 'Open the demo')}</a></div>
-    <div class="entry stack"><div><h3>sistema-real</h3><p>${t(lang, 'El sistema desplegado, en una pestaña nueva.', 'The deployed system, in a new tab.')}</p></div><p class="notice" id="aviso-sistema">${aviso}</p>${ext(URL_SISTEMA, sistemaLabel, sistemaLabel + ic('i-ext', 16), lang, 'btn').replace('<a ', '<a aria-describedby="aviso-sistema" ')}</div>`, false);
-}
-
-const PROJECT_TEXT = {
-  es: 'Plataforma de trazabilidad ESG para recicladores formalizados de Lima Metropolitana. Conecta a vecinos y empresas con asociaciones de recicladores y emite un certificado digital en PDF.',
-  en: 'An ESG traceability platform for formalized recyclers in Metropolitan Lima. It connects neighbors and companies with recycler associations and issues a digital PDF certificate.',
-};
-
-const CONTACTO_LEAD = { es: '¿Tienes un servicio por construir o un equipo que reforzar?', en: 'Have a service to build or a team to reinforce?' };
+const tagList = (items, label) => `<ul class="chips-tech" aria-label="${label}">${items.map((x) => `<li>${x}</li>`).join('')}</ul>`;
 
 /* CV: se enlaza solo si el archivo existe al generar el sitio; si no, queda el marcador y ningún enlace. */
 const CV_RUTA = 'assets/cv/CV_Angel_Saenz.pdf';
 const CV_BYTES = existsSync(join(ROOT, CV_RUTA)) ? statSync(join(ROOT, CV_RUTA)).size : null;
 const cvTamano = () => (CV_BYTES < 1024 * 1024 ? `${Math.max(1, Math.round(CV_BYTES / 1024))} KB` : `${(CV_BYTES / 1024 / 1024).toFixed(1)} MB`);
-const cvLink = (lang, root, cls) => {
-  /* El nombre accesible empieza por el texto visible (WCAG 2.5.3). */
-  const aria = t(lang, `Ver CV (PDF, ${CV_BYTES === null ? '' : cvTamano()}) de ${NOMBRE} ${UI[lang].newTab}`,
-    `View CV (PDF, ${CV_BYTES === null ? '' : cvTamano()}) by ${NOMBRE} ${UI[lang].newTab}`);
-  return `<a class="${cls}" href="${root}${CV_RUTA}" target="_blank" rel="noopener noreferrer" aria-label="${aria}">${t(lang, 'Ver CV', 'View CV')} <span class="sz">(PDF, ${cvTamano()})</span>${ic('i-ext', 16)}</a>`;
-};
 const cvTodo = (lang) => `<span class="todo">${t(lang, '[CV por confirmar]', '[CV to be confirmed]')}</span>`;
-const mailChip = () => `<a class="tag" href="mailto:${CORREO}">${CORREO}</a>`;
+const cvButton = (lang, root) => {
+  const visible = `${t(lang, 'Ver CV', 'View CV')} (PDF, ${cvTamano()})`;
+  const aria = `${visible} ${t(lang, 'de', 'by')} ${NOMBRE} ${UI[lang].newTab}`;
+  return `<a class="btn" href="${root}${CV_RUTA}" target="_blank" rel="noopener noreferrer" aria-label="${aria}">${ic('i-cv', 18)}<span>${t(lang, 'Ver CV', 'View CV')} <span class="sz">(PDF, ${cvTamano()})</span></span></a>`;
+};
 
-function contacto(lang, root) {
-  const nombreLi = (href, text, label) => `<p class="mono"><span class="cmd">open</span> ${ext(href, label, text, lang)}</p>`;
-  return section('contacto', 'contacto.sh', 'sh', 'Shell', 'shell', 'f-con', `  <h2 class="title-px" id="f-con">${t(lang, '¿Hablamos?', 'Shall we talk?')}</h2>
-  <p class="mono"><span class="cm">#!/bin/sh</span></p>
-  <p class="lead">${CONTACTO_LEAD[lang]}</p>
-  <p>${DISPONIBILIDAD[lang]}</p>
-  <p class="mono"><span class="cmd">echo</span> <span class="st">"${t(lang, 'correo', 'email')}: </span><a href="mailto:${CORREO}">${CORREO}</a><span class="st">"</span></p>
-  <p class="mono"><span class="cmd">echo</span> <span class="st">"cv: </span>${CV_BYTES === null ? cvTodo(lang) : `<a href="${root}${CV_RUTA}" target="_blank" rel="noopener noreferrer" aria-label="CV_Angel_Saenz.pdf (PDF, ${cvTamano()}) ${UI[lang].newTab}">CV_Angel_Saenz.pdf (PDF, ${cvTamano()})</a>`}<span class="st">"</span></p>
-  ${nombreLi(URL_LINKEDIN, 'linkedin.com/in/saenzdev', `LinkedIn ${t(lang, 'de', 'of')} ${NOMBRE}`)}
-  ${nombreLi(URL_GITHUB, 'github.com/Reedsy2407', `GitHub ${t(lang, 'de', 'of')} ${NOMBRE}`)}
-  <div class="cta"><a class="btn primary" href="mailto:${CORREO}">${t(lang, 'Escribir por correo', 'Write by email')}</a>${ext(URL_LINKEDIN, t(lang, 'Escribir por LinkedIn', 'Write on LinkedIn'), t(lang, 'Escribir por LinkedIn', 'Write on LinkedIn'), lang, 'btn')}${CV_BYTES === null ? '' : cvLink(lang, root, 'btn')}</div>`, 'sh');
-}
+const PROJECT_TEXT = {
+  es: 'Plataforma de trazabilidad ESG para recicladores formalizados de Lima Metropolitana. Conecta a vecinos y empresas con asociaciones de recicladores y emite un certificado digital en PDF. Son cuatro servicios en Java 21 y Spring Boot 3.3.5 con arquitectura hexagonal, patrón Outbox/Inbox y Liquibase, más un frontend en Angular.',
+  en: 'An ESG traceability platform for formalized recyclers in Metropolitan Lima. It connects neighbors and companies with recycler associations and issues a digital PDF certificate. It has four services on Java 21 and Spring Boot 3.3.5 with hexagonal architecture, the Outbox/Inbox pattern and Liquibase, plus an Angular frontend.',
+};
 
 /* ── Portada ───────────────────────────────────────── */
 const EXPERIENCIA = [
   {
     empresa: 'HRF GROUP S.A.C.',
     cargo: ['Desarrollador backend Java', 'Java backend developer'],
-    periodo: ['abril 2026 – actualidad (remoto)', 'April 2026 – present (remote)'],
+    periodo: ['abril 2026 – actualidad · remoto', 'April 2026 – present · remote'],
     contexto: ['plataforma de e-commerce B2B', 'B2B e-commerce platform'],
     hechos: [
       ['Microservicios en Java 21 y Spring Boot 3.x con arquitectura hexagonal.', 'Microservices on Java 21 and Spring Boot 3.x with hexagonal architecture.'],
-      ['Corrección de errores de cálculo de precios y promociones, rastreando la causa raíz entre capas.', 'Fixed pricing and promotion calculation bugs by tracing the root cause across layers.'],
+      ['Corrección de errores de precios y promociones, rastreando la causa raíz entre capas.', 'Fixed pricing and promotion bugs by tracing the root cause across layers.'],
       ['Endpoints batch para consulta masiva de stock entre microservicios.', 'Batch endpoints for bulk stock queries between microservices.'],
-      ['PostgreSQL multi-schema y Liquibase.', 'Multi-schema PostgreSQL and Liquibase.'],
-      ['Despliegues a QA en Kubernetes con ArgoCD y hotfixes controlados.', 'QA deployments on Kubernetes with ArgoCD and controlled hotfixes.'],
-      ['Monitoreo con Dynatrace, Azure DevOps y revisiones de código.', 'Monitoring with Dynatrace, Azure DevOps and code reviews.'],
+      ['Despliegues a QA con ArgoCD, hotfixes controlados y monitoreo con Dynatrace.', 'QA deployments with ArgoCD, controlled hotfixes and Dynatrace monitoring.'],
     ],
+    tec: ['Java 21', 'Spring Boot 3.x', 'PostgreSQL', 'Liquibase', 'Kubernetes', 'ArgoCD', 'Dynatrace', 'Azure DevOps'],
   },
   {
     empresa: 'HRF GROUP S.A.C.',
@@ -271,9 +246,9 @@ const EXPERIENCIA = [
     hechos: [
       ['Lambdas en Java 21 con arquitectura hexagonal.', 'Lambdas in Java 21 with hexagonal architecture.'],
       ['S3 con enlaces de descarga seguros.', 'S3 with secure download links.'],
-      ['Step Functions con registro de ejecuciones en DynamoDB.', 'Step Functions with execution logging in DynamoDB.'],
-      ['Cambios en MySQL.', 'MySQL changes.'],
+      ['Step Functions con registro de ejecuciones en DynamoDB y cambios en MySQL.', 'Step Functions with execution logging in DynamoDB, and MySQL changes.'],
     ],
+    tec: ['Java 21', 'AWS Lambda', 'S3', 'Step Functions', 'DynamoDB', 'MySQL'],
   },
   {
     empresa: 'HRF GROUP S.A.C.',
@@ -281,22 +256,21 @@ const EXPERIENCIA = [
     periodo: ['sep – dic 2025', 'Sep – Dec 2025'],
     contexto: ['CRM empresarial', 'enterprise CRM'],
     hechos: [
-      ['.NET Core y Python.', '.NET Core and Python.'],
-      ['APIs REST y GraphQL.', 'REST and GraphQL APIs.'],
+      ['APIs REST y GraphQL en .NET Core y Python.', 'REST and GraphQL APIs in .NET Core and Python.'],
       ['Procesamiento masivo de CSV.', 'Bulk CSV processing.'],
       ['Repository y Unit of Work con Entity Framework.', 'Repository and Unit of Work with Entity Framework.'],
     ],
+    tec: ['.NET Core', 'Python', 'REST', 'GraphQL', 'Entity Framework'],
   },
   {
     empresa: 'Hera Consulting SAC',
     cargo: ['Analista programador Java junior', 'Junior Java programmer analyst'],
-    periodo: ['julio 2025 – actualidad (jornada parcial)', 'July 2025 – present (part-time)'],
+    periodo: ['julio 2025 – actualidad · jornada parcial', 'July 2025 – present · part-time'],
     hechos: [
       ['Aplicaciones empresariales en Java y Python (Spring MVC, JSP, Servlets).', 'Enterprise applications in Java and Python (Spring MVC, JSP, Servlets).'],
       ['Módulos de Odoo con integraciones de WhatsApp e IA.', 'Odoo modules with WhatsApp and AI integrations.'],
-      ['Oracle y PostgreSQL.', 'Oracle and PostgreSQL.'],
-      ['Angular y TypeScript.', 'Angular and TypeScript.'],
     ],
+    tec: ['Java', 'Python', 'Spring MVC', 'Odoo', 'Oracle', 'PostgreSQL', 'Angular', 'TypeScript'],
   },
   {
     empresa: 'COMPIPRO',
@@ -305,29 +279,33 @@ const EXPERIENCIA = [
     hechos: [
       ['Módulos de logística, asistencias y CRM.', 'Logistics, attendance and CRM modules.'],
       ['Chat en tiempo real con WebSockets (Workerman).', 'Real-time chat with WebSockets (Workerman).'],
-      ['PHP, JavaScript y MVC.', 'PHP, JavaScript and MVC.'],
     ],
+    tec: ['PHP', 'JavaScript', 'MVC', 'WebSockets'],
   },
 ];
 
-function homeSections(lang, hrefs, root) {
+function homeSections(lang, root) {
   const u = UI[lang];
-  const perfil = section('perfil', t(lang, 'perfil.md', 'profile.md'), 'md', 'Markdown', 'markdown', 'f-perfil', `  <p class="prompt"><span class="ps">${u.user}</span><span class="punc">:~$</span> <span class="typed">whoami</span><i class="caret" aria-hidden="true"></i></p>
+  const copiarLabel = `${t(lang, 'Copiar correo', 'Copy email')} ${CORREO}`;
+  const chipLabel = (nombre) => `${nombre} ${t(lang, 'de', 'of')} ${NOMBRE}`;
+  const perfil = section('perfil', t(lang, 'perfil.md', 'profile.md'), 'md', 'Markdown', 'markdown', 'f-perfil', `  <p class="prompt"><span class="ps">${u.user}</span><span class="punc">:~$</span> <span class="typed" style="--ch:${t(lang, 14, 16)}">${t(lang, 'cat saludo.txt', 'cat greeting.txt')}</span><i class="caret" aria-hidden="true"></i></p>
   <p class="mono rise" style="--i:1"><span class="cm">${t(lang, '// hola, soy', "// hi, I'm")}</span></p>
   <h1 class="name" id="f-perfil"><span class="nm" data-text="${NOMBRE}">${NOMBRE}</span></h1>
   <p class="role rise" style="--i:2">// Backend Developer</p>
+  <ul class="stack-tags rise" style="--i:2" aria-label="${t(lang, 'Stack principal', 'Main stack')}">${['Java / Spring Boot', 'AWS', 'Kubernetes', 'Angular', 'PostgreSQL'].map((x) => `<li><span aria-hidden="true">// </span>${x}</li>`).join('')}</ul>
   <p class="lead">${t(lang,
     'Desarrollador backend en Lima. Construyo microservicios con Java y Spring Boot, trabajo con servicios de AWS y despliego en Kubernetes y Azure DevOps.',
     'Backend developer based in Lima. I build microservices with Java and Spring Boot, work with AWS services and deploy on Kubernetes and Azure DevOps.')}</p>
   <div class="cta rise" style="--i:3">
-    <a class="btn primary" href="#contacto">${t(lang, 'Contactar', 'Get in touch')}</a>
-    <a class="btn" href="${hrefs.caso}">${t(lang, 'Ver proyecto', 'View project')}</a>
-    ${CV_BYTES === null ? '' : cvLink(lang, root, 'btn')}
+    <a class="btn primary" href="#sobre-mi">${t(lang, 'Sobre mí', 'About me')}</a>
+    ${CV_BYTES === null ? '' : cvButton(lang, root)}
   </div>
   <div class="links rise" style="--i:4">
-    ${chip(URL_LINKEDIN, 'LinkedIn', 'LinkedIn', lang)}
-    ${chip(URL_GITHUB, 'GitHub', 'GitHub', lang)}
-    ${mailChip()}
+    ${ext(URL_LINKEDIN, chipLabel('LinkedIn'), `${ic('i-linkedin', 18)}LinkedIn`, lang, 'tag')}
+    ${ext(URL_GITHUB, chipLabel('GitHub'), `${ic('i-github', 18)}GitHub`, lang, 'tag')}
+    <a class="tag" id="copiar-correo" href="mailto:${CORREO}" data-label="${copiarLabel}" data-ok="${t(lang, 'Copiado', 'Copied')}" data-fail="${t(lang, 'No se pudo copiar', 'Could not copy')}">${ic('i-mail', 18)}<span>${CORREO}</span></a>
+    <a class="tag js-only" href="mailto:${CORREO}">${t(lang, 'Escribir', 'Write')}</a>
+    <span class="copiado" id="copiado" aria-live="polite"></span>
   </div>
   ${CV_BYTES === null ? `<p class="note">CV: ${cvTodo(lang)}</p>` : ''}
   <div class="fm rise" style="--i:5">
@@ -367,128 +345,41 @@ function homeSections(lang, hrefs, root) {
       ${row(t(lang, 'herramientas', 'tools'), 'Git · Swagger/OpenAPI · Postman · Scrum')}
     </ul>`)}`);
 
-  const pair = (k, v) => `<dt>${k}</dt><dd>${v}</dd>`;
-  const entrada = (e, last) => `<li><span class="punc" aria-hidden="true">{</span><dl>${pair(t(lang, 'empresa', 'company'), e.empresa)}${pair(t(lang, 'cargo', 'role'), t(lang, ...e.cargo))}${pair(t(lang, 'periodo', 'period'), t(lang, ...e.periodo))}${e.contexto ? pair(t(lang, 'contexto', 'context'), t(lang, ...e.contexto)) : ''}${pair(t(lang, 'hechos', 'work'), `<ul class="facts">${e.hechos.map((h) => `<li>${t(lang, ...h)}</li>`).join('')}</ul>`)}</dl><span class="punc" aria-hidden="true">}${last ? '' : ','}</span></li>`;
-  const exp = section('experiencia', t(lang, 'experiencia.json', 'experience.json'), 'json', 'JSON', 'json', 'f-exp', `  <h2 class="title-px" id="f-exp">${t(lang, 'Experiencia', 'Experience')}</h2>
-  <p class="mono"><span class="cm">${t(lang, '// de la más reciente a la más antigua; los clientes finales no se nombran', '// most recent first; end clients are not named')}</span></p>
-  <div class="json wide">
-    <p class="mono"><span class="punc" aria-hidden="true">[</span></p>
-    <ol>
-      ${EXPERIENCIA.map((e, i) => entrada(e, i === EXPERIENCIA.length - 1)).join('\n      ')}
-    </ol>
-    <p class="mono"><span class="punc" aria-hidden="true">]</span></p>
-  </div>`);
+  const job = (e) => `<li class="job">
+      <p class="job-when">${t(lang, ...e.periodo)}</p>
+      <h3 class="job-title">${t(lang, ...e.cargo)} <span class="sep" aria-hidden="true">·</span> <span class="co">${e.empresa}</span></h3>
+      ${e.contexto ? `<p class="job-ctx">${t(lang, ...e.contexto)}</p>` : ''}
+      <ul class="job-facts">${e.hechos.map((h) => `<li>${t(lang, ...h)}</li>`).join('')}</ul>
+      ${tagList(e.tec, t(lang, 'Tecnologías', 'Technologies'))}
+    </li>`;
+  const exp = section('experiencia', t(lang, 'experiencia.md', 'experience.md'), 'md', 'Markdown', t(lang, 'línea de tiempo', 'timeline'), 'f-exp', `  <h2 class="title-px" id="f-exp">${t(lang, 'Experiencia', 'Experience')}</h2>
+  <p class="mono"><span class="cm">${t(lang, '// de lo más reciente a lo más antiguo. Por confidencialidad no nombro a los clientes finales.', "// most recent first. For confidentiality I don't name end clients.")}</span></p>
+  <ol class="timeline">
+    ${EXPERIENCIA.map(job).join('\n    ')}
+  </ol>`);
 
-  const proyecto = section('proyecto', 'esg-trazabilidad.md', 'md', 'Markdown', t(lang, 'proyecto destacado', 'featured project'), 'f-pro', `  <h2 class="title-px" id="f-pro">${t(lang, 'Proyecto destacado', 'Featured project')}</h2>
-  <p class="mono"><span class="cm"># esg-trazabilidad</span></p>
-  <p class="lead">${PROJECT_TEXT[lang]}</p>
-  ${entradas(lang, hrefs.demo)}
-  <p><a href="${hrefs.caso}">${t(lang, 'Leer el caso de estudio', 'Read the case study')}</a></p>
-  <p class="mono"><span class="cm">${t(lang, '// otros proyectos propios', '// other personal projects')}</span></p>
-  ${win(t(lang, 'otros-proyectos.ts', 'other-projects.ts'), `<ul class="tags">
-      ${row('Portal Laboral', 'Spring Boot · Spring Security con JWT · Angular · MySQL')}
-      ${row('Helpcore', t(lang, 'microservicios con API Gateway, autenticación, config server y notificaciones con Redis', 'microservices with API Gateway, authentication, config server and Redis notifications'))}
-    </ul>`)}`);
-
-  return [perfil, sobre, hab, exp, proyecto, contacto(lang, root)];
-}
-
-/* ── Caso de estudio ───────────────────────────────── */
-const DEMO_ROWS = [
-  ['Vecino', 1, 'A', 'Plástico', 18, 'certificado'], ['Empresa', 1, 'B', 'Cartón', 240, 'certificado'],
-  ['Vecino', 2, 'A', 'Vidrio', 22, 'recogido'], ['Empresa', 2, 'C', 'Papel', 180, 'recogido'],
-  ['Vecino', 3, 'B', 'Metal', 9, 'programado'], ['Empresa', 3, 'A', 'Plástico', 310, 'programado'],
-  ['Vecino', 4, 'C', 'Cartón', 14, 'solicitado'], ['Empresa', 4, 'B', 'Vidrio', 120, 'solicitado'],
-  ['Vecino', 5, 'A', 'Papel', 11, 'certificado'], ['Empresa', 5, 'C', 'Metal', 960, 'recogido'],
-  ['Vecino', 6, 'B', 'Plástico', 16, 'programado'], ['Empresa', 6, 'A', 'Cartón', 1120, 'certificado'],
-];
-const MAT_EN = { Plástico: 'Plastic', Cartón: 'Cardboard', Vidrio: 'Glass', Papel: 'Paper', Metal: 'Metal' };
-const ESTADOS = {
-  todos: ['Todos', 'All'], solicitado: ['Solicitado', 'Requested'], programado: ['Programado', 'Scheduled'],
-  recogido: ['Recogido', 'Collected'], certificado: ['Certificado', 'Certified'],
-};
-const thin = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
-function demoHtml(lang) {
-  const tr = DEMO_ROWS.map(([who, n, assoc, mat, kg, est], i) => {
-    const num = String(n).padStart(2, '0');
-    const solic = `${t(lang, who, who === 'Vecino' ? 'Neighbor' : 'Company')} ${num}`;
-    return `<tr data-estado="${est}" data-kg="${kg}"><td>R-${String(i + 1).padStart(3, '0')}</td><td>${solic}</td><td>${t(lang, 'Asociación', 'Association')} ${assoc}</td><td>${t(lang, mat, MAT_EN[mat])}</td><td>${thin(kg)}</td><td>${t(lang, ESTADOS[est][0], ESTADOS[est][1])}</td></tr>`;
-  }).join('\n        ');
-  const total = DEMO_ROWS.reduce((s, r) => s + r[4], 0);
-  const tpl = t(lang, 'Resumen simulado: {n} recojos · {kg} kg', 'Simulated summary: {n} pickups · {kg} kg');
-  const chips = Object.entries(ESTADOS).map(([k, v], i) =>
-    `<li><button class="chip" type="button" data-filtro="${k}" aria-pressed="${i === 0}">${t(lang, v[0], v[1])}</button></li>`).join('');
-  const sim = `<span class="sim">${t(lang, 'datos simulados', 'simulated data')}</span>`;
-  return win('demo.csv', `<ul class="chips" id="demo-filtros" aria-label="${t(lang, 'Filtrar por estado', 'Filter by status')}" hidden>${chips}</ul>
-      <div class="table-wrap" id="demo-tabla" role="region" aria-labelledby="f-demo" tabindex="0"><table>
-      <thead><tr><th>${t(lang, 'Recojo', 'Pickup')}</th><th>${t(lang, 'Solicitante', 'Requester')}</th><th>${t(lang, 'Asociación', 'Association')}</th><th>Material</th><th>kg</th><th>${t(lang, 'Estado', 'Status')}</th></tr></thead>
-      <tbody>
-        ${tr}
-      </tbody></table></div>
-      <p class="cert" id="demo-resumen" data-tpl="${tpl}">${tpl.replace('{n}', DEMO_ROWS.length).replace('{kg}', thin(total))}</p>`, true, sim);
-}
-
-function casoSections(lang, hrefs, root) {
-  const u = UI[lang];
-  const resumen = section('resumen', t(lang, 'resumen.md', 'summary.md'), 'md', 'Markdown', t(lang, 'caso de estudio', 'case study'), 'f-res0', `  <p class="prompt"><span class="ps">${u.user}</span><span class="punc">:~$</span> <span class="typed" style="--ch:8">${t(lang, 'cat caso', 'cat case')}</span><i class="caret" aria-hidden="true"></i></p>
-  <p class="mono rise" style="--i:1"><span class="cm">${t(lang, '// proyecto destacado', '// featured project')}</span></p>
-  <h1 class="name" id="f-res0"><span class="nm" data-text="esg-trazabilidad">esg-trazabilidad</span></h1>
-  <p class="lead">${PROJECT_TEXT[lang]}</p>
-  <p class="note">${t(lang, 'Proyecto académico, sin validez legal.', 'Academic project, with no legal validity.')}</p>
-  <div class="cta rise" style="--i:3">
-    <a class="btn primary" href="#demo">${t(lang, 'Ver demo instantánea', 'View instant demo')}</a>
-    <a class="btn" href="#entradas">${t(lang, 'Abrir sistema real', 'Open real system')}</a>
-  </div>
-  <div class="fm rise" style="--i:4">
-    <p aria-hidden="true">---</p>
-    <dl>
-      <dt>stack:</dt><dd>Java 21, Spring Boot 3.3.5, Angular</dd>
-      <dt>${t(lang, 'contexto', 'context')}:</dt><dd>${t(lang, 'Proyecto académico (EFSRT, CIBERTEC) · septiembre – octubre 2026', 'Academic project (EFSRT, CIBERTEC) · September – October 2026')}</dd>
-    </dl>
-    <p aria-hidden="true">---</p>
-  </div>`);
-
-  const ent = section('entradas', 'entradas.sh', 'sh', 'Shell', t(lang, 'dos formas de verlo', 'two ways to see it'), 'f-ent', `  <h2 class="title-px" id="f-ent">${t(lang, 'Dos entradas', 'Two entry points')}</h2>
-  <p class="mono"><span class="cm">${t(lang, '// la demo es instantánea; el sistema real puede tardar', '// the demo is instant; the real system may take a while')}</span></p>
-  ${entradas(lang, '#demo')}`, 'sh');
-
-  const demo = section('demo', 'demo.csv', 'csv', 'CSV', t(lang, 'datos simulados', 'simulated data'), 'f-demo', `  <h2 class="title-px" id="f-demo">${t(lang, 'Demo instantánea', 'Instant demo')}</h2>
-  <p class="mono"><span class="cm">${t(lang, '// datos simulados · sin llamadas de red', '// simulated data · no network calls')}</span></p>
-  <p>${t(lang,
-    'Esta vista vive en el propio sitio: los recojos son <b>datos simulados</b>, no vienen del sistema real.',
-    'This view lives in the site itself: the pickups are <b>simulated data</b> and do not come from the real system.')}</p>
-  ${demoHtml(lang)}`);
-
-  const nodos = [['auth', 'Java 21 · Spring Boot 3.3.5'], ['recycler', 'Java 21 · Spring Boot 3.3.5'], ['collection', 'Java 21 · Spring Boot 3.3.5'], ['reporting', 'Java 21 · Spring Boot 3.3.5'], ['frontend', 'Angular']];
-  const arq = section('arquitectura', t(lang, 'arquitectura.md', 'architecture.md'), 'ts', 'Markdown', t(lang, 'servicios y despliegue', 'services and deployment'), 'f-arq', `  <h2 class="title-px" id="f-arq">${t(lang, 'Arquitectura', 'Architecture')}</h2>
-  <p class="lead">${t(lang, 'Cuatro servicios en Java 21 y Spring Boot 3.3.5, con un frontend en Angular.', 'Four services on Java 21 and Spring Boot 3.3.5, with an Angular frontend.')}</p>
-  ${win('servicios.ts', `<ul class="node-grid">${nodos.map(([n, s]) => `<li class="node"><strong>${n}</strong><span>${s}</span></li>`).join('')}</ul>
-    <p class="pillars">${t(lang, 'arquitectura hexagonal · patrón Outbox/Inbox · Liquibase', 'hexagonal architecture · Outbox/Inbox pattern · Liquibase')}</p>
-    <p class="pillars">${t(lang, 'despliegue', 'deployment')}: Render · Neon · CloudAMQP</p>`)}`);
-
-  const dec = section('decisiones', t(lang, 'decisiones.md', 'decisions.md'), 'md', 'Markdown', t(lang, 'y su porqué', 'and why'), 'f-dec', `  <h2 class="title-px" id="f-dec">${t(lang, 'Decisiones', 'Decisions')}</h2>
-  <ul class="plain dec">
-    <li><strong>${t(lang, 'Arquitectura hexagonal', 'Hexagonal architecture')}</strong>${t(lang, 'El dominio de cada servicio queda aislado de la entrada y la salida.', "Each service's domain stays isolated from its inputs and outputs.")}</li>
-    <li><strong>${t(lang, 'Patrón Outbox/Inbox', 'Outbox/Inbox pattern')}</strong>${t(lang, 'Los eventos entre servicios se registran antes de enviarse o procesarse.', 'Events between services are recorded before they are sent or processed.')}</li>
-    <li><strong>Liquibase</strong>${t(lang, 'El esquema de datos se versiona con migraciones.', 'The data schema is versioned with migrations.')}</li>
-    <li><strong>${t(lang, 'Origen de los patrones', 'Where the patterns come from')}</strong>${t(lang, 'Tomados del concepto de un sistema profesional, sin datos ni código de ninguna empresa.', "Taken from the concept of a professional system, with no company's data or code.")}</li>
+  const proyectos = section('proyectos', t(lang, 'proyectos.md', 'projects.md'), 'md', 'Markdown', t(lang, 'proyecto destacado y propios', 'featured and personal projects'), 'f-pro', `  <h2 class="title-px" id="f-pro">${t(lang, 'Proyectos', 'Projects')}</h2>
+  <article class="project wide" aria-labelledby="p-esg">
+    <h3 id="p-esg">esg-trazabilidad</h3>
+    <p class="project-meta">${t(lang, 'Proyecto académico (EFSRT, CIBERTEC) · septiembre – octubre 2026', 'Academic project (EFSRT, CIBERTEC) · September – October 2026')}</p>
+    <p>${PROJECT_TEXT[lang]}</p>
+    ${tagList(['Java 21', 'Spring Boot 3.3.5', 'Angular', 'PostgreSQL', 'Liquibase', 'Render', 'Neon', 'CloudAMQP'], t(lang, 'Tecnologías', 'Technologies'))}
+    <p class="notice" id="aviso-sistema"><b>${t(lang, 'Aviso:', 'Notice:')}</b> ${t(lang,
+      'puede tardar hasta 1 minuto en despertar (hosting gratuito). El propio sistema ofrece una cuenta demo de un clic para entrar sin registrarte.',
+      'it may take up to 1 minute to wake up (free hosting). The system itself offers a one-click demo account so you can sign in without registering.')}</p>
+    <div class="cta">
+      ${ext(URL_SISTEMA, `${t(lang, 'Abrir el sistema real', 'Open the real system')} ${t(lang, 'de', 'of')} esg-trazabilidad`, `${t(lang, 'Abrir el sistema real', 'Open the real system')}${ic('i-ext', 16)}`, lang, 'btn primary', ' aria-describedby="aviso-sistema"')}
+      ${ext(URL_CODIGO, `${t(lang, 'Código', 'Code')} ${t(lang, 'de', 'of')} esg-trazabilidad`, `${ic('i-github', 18)}${t(lang, 'Código', 'Code')}`, lang, 'btn')}
+      ${ext(URL_DOCS, `${t(lang, 'Documentación', 'Documentation')} ${t(lang, 'de', 'of')} esg-trazabilidad`, `${ic('i-file', 18)}${t(lang, 'Documentación', 'Documentation')}`, lang, 'btn')}
+    </div>
+  </article>
+  <h3 class="sub">${t(lang, 'Proyectos propios', 'Personal projects')}</h3>
+  <ul class="plain dec own">
+    <li><strong>Portal Laboral</strong>${t(lang, 'Spring Boot, Spring Security con JWT, Angular y MySQL.', 'Spring Boot, Spring Security with JWT, Angular and MySQL.')}</li>
+    <li><strong>Helpcore</strong>${t(lang, 'Microservicios con API Gateway, autenticación, config server y notificaciones con Redis.', 'Microservices with API Gateway, authentication, config server and Redis notifications.')}</li>
   </ul>`);
 
-  const enl = section('enlaces', t(lang, 'enlaces.md', 'links.md'), 'md', 'Markdown', t(lang, 'documentación y código', 'documentation and code'), 'f-enl', `  <h2 class="title-px" id="f-enl">${t(lang, 'Documentación y código', 'Docs and code')}</h2>
-  <div class="links">
-    ${ext(URL_DOCS, t(lang, 'Portal de documentación de esg-trazabilidad', 'esg-trazabilidad documentation portal'), `${t(lang, 'Documentación', 'Docs')}${ic('i-ext', 16)}`, lang, 'tag')}
-    ${ext(URL_CODIGO, t(lang, 'Código de esg-trazabilidad', 'esg-trazabilidad source code'), `${t(lang, 'Código', 'Code')}${ic('i-ext', 16)}`, lang, 'tag')}
-  </div>`);
-
-  const resultados = section('resultados', t(lang, 'resultados.json', 'results.json'), 'json', 'JSON', 'json', 'f-resu', `  <h2 class="title-px" id="f-resu">${t(lang, 'Resultados', 'Results')}</h2>
-  <div class="json">
-    <p class="mono"><span class="punc" aria-hidden="true">{</span></p>
-    <ol><li><dl><dt>${t(lang, 'cifras', 'figures')}</dt><dd>${todo(lang)}</dd><dt>${t(lang, 'capturas', 'screenshots')}</dt><dd>${todo(lang)}</dd></dl></li></ol>
-    <p class="mono"><span class="punc" aria-hidden="true">}</span></p>
-  </div>`);
-
-  return [resumen, ent, demo, arq, dec, enl, resultados, contacto(lang, root)];
+  return [perfil, sobre, hab, exp, proyectos];
 }
 
 /* ── 404 ───────────────────────────────────────────── */
@@ -505,43 +396,23 @@ function notFoundSections() {
 /* ── Montaje ───────────────────────────────────────── */
 const pages = [];
 for (const lang of ['es', 'en']) {
-  const u = UI[lang];
-  for (const kind of ['home', 'caso']) {
-    const file = PAGES[lang][kind];
-    const root = '../'.repeat(file.split('/').length - 1);
-    const rel = (to) => posix.relative(posix.dirname(file), to) || posix.basename(to);
-    const hrefs = { home: rel(PAGES[lang].home), caso: rel(PAGES[lang].caso), demo: `${rel(PAGES[lang].caso)}#demo` };
-    const langLinks = {};
-    langLinks.es = lang === 'es' ? posix.basename(file) : rel(PAGES.es[kind]);
-    langLinks.en = lang === 'en' ? posix.basename(file) : rel(PAGES.en[kind]);
-    let tabs;
-    let tree;
-    let sections;
-    let gutterRows;
-    let title;
-    let desc;
-    if (kind === 'home') {
-      sections = homeSections(lang, hrefs, root);
-      tabs = [['perfil', t(lang, 'perfil.md', 'profile.md'), 'md'], ['sobre-mi', t(lang, 'sobre-mi.md', 'about.md'), 'md'], ['habilidades', t(lang, 'habilidades.ts', 'skills.ts'), 'ts'],
-        ['experiencia', t(lang, 'experiencia.json', 'experience.json'), 'json'], ['proyecto', 'esg-trazabilidad.md', 'md'], ['contacto', 'contacto.sh', 'sh']]
-        .map(([id, name, type]) => ({ href: `#${id}`, name, type }));
-      tree = [{ dir: 'portafolio', items: tabs }, { dir: t(lang, 'proyectos', 'projects'), items: [{ href: hrefs.caso, name: 'esg-trazabilidad/', type: 'md' }] }];
-      gutterRows = 290;
-      title = `${NOMBRE} — Backend Developer`;
-      desc = t(lang, 'Portafolio de Angel Saenz, desarrollador backend en Lima: Java, Spring Boot, Python, Odoo y nube. Caso de estudio: esg-trazabilidad.',
-        'Portfolio of Angel Saenz, backend developer in Lima: Java, Spring Boot, Python, Odoo and cloud. Case study: esg-trazabilidad.');
-    } else {
-      sections = casoSections(lang, hrefs, root);
-      tabs = [['resumen', t(lang, 'resumen.md', 'summary.md'), 'md'], ['entradas', 'entradas.sh', 'sh'], ['demo', 'demo.csv', 'csv'], ['arquitectura', t(lang, 'arquitectura.md', 'architecture.md'), 'ts'],
-        ['decisiones', t(lang, 'decisiones.md', 'decisions.md'), 'md'], ['enlaces', t(lang, 'enlaces.md', 'links.md'), 'md'], ['resultados', t(lang, 'resultados.json', 'results.json'), 'json'], ['contacto', 'contacto.sh', 'sh']]
-        .map(([id, name, type]) => ({ href: `#${id}`, name, type }));
-      tree = [{ dir: 'esg-trazabilidad', items: tabs }, { dir: 'portafolio', items: [{ href: hrefs.home, name: t(lang, '← inicio', '← home'), type: 'md' }] }];
-      gutterRows = 230;
-      title = `esg-trazabilidad — ${NOMBRE}`;
-      desc = t(lang, 'Caso de estudio esg-trazabilidad: demo instantánea con datos simulados y acceso al sistema real.', 'Case study esg-trazabilidad: instant demo with simulated data and access to the real system.');
-    }
-    pages.push({ file, html: frame({ lang, file, root, title, desc, tabs, tree, sections, gutterRows, langLinks, modo: 'Markdown' }) });
-  }
+  const file = PAGES[lang].home;
+  const root = '../'.repeat(file.split('/').length - 1);
+  const sections = homeSections(lang, root);
+  const tabs = [['perfil', t(lang, 'perfil.md', 'profile.md'), 'md'], ['sobre-mi', t(lang, 'sobre-mi.md', 'about.md'), 'md'], ['habilidades', t(lang, 'habilidades.ts', 'skills.ts'), 'ts'],
+    ['experiencia', t(lang, 'experiencia.md', 'experience.md'), 'md'], ['proyectos', t(lang, 'proyectos.md', 'projects.md'), 'md']]
+    .map(([id, name, type]) => ({ href: `#${id}`, name, type }));
+  const rel = (to) => posix.relative(posix.dirname(file), to) || posix.basename(to);
+  const langLinks = { es: lang === 'es' ? posix.basename(file) : rel(PAGES.es.home), en: lang === 'en' ? posix.basename(file) : rel(PAGES.en.home) };
+  pages.push({
+    file,
+    html: frame({
+      lang, file, root, title: `${NOMBRE} — Backend Developer`,
+      desc: t(lang, 'Portafolio de Angel Saenz, desarrollador backend en Lima: Java, Spring Boot, AWS, Kubernetes y el proyecto esg-trazabilidad.',
+        'Portfolio of Angel Saenz, backend developer in Lima: Java, Spring Boot, AWS, Kubernetes and the esg-trazabilidad project.'),
+      tabs, tree: [{ dir: 'portafolio', items: tabs }], sections, gutterRows: 250, langLinks, modo: 'Markdown',
+    }),
+  });
 }
 /* 404: bilingüe, en la raíz; sin interruptor de idioma. */
 pages.push({
@@ -549,7 +420,7 @@ pages.push({
   html: frame({
     lang: 'es', file: '404.html', root: '', title: `404 — ${NOMBRE}`, desc: 'Página no encontrada.',
     tabs: [{ href: '#error', name: '404.log', type: 'sh' }],
-    tree: [{ dir: 'portafolio', items: [{ href: 'index.html', name: 'perfil.md', type: 'md' }, { href: 'caso/esg-trazabilidad.html', name: 'esg-trazabilidad/', type: 'md' }] }],
+    tree: [{ dir: 'portafolio', items: [{ href: 'index.html', name: 'perfil.md', type: 'md' }] }],
     sections: notFoundSections(), gutterRows: 60, langLinks: null, modo: 'Log',
   }),
 });

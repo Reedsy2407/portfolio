@@ -1,5 +1,6 @@
-// Capturas locales del sitio (360, 1280 y 1920 px; tema oscuro y claro) en design/refs/sitio/, que git ignora.
-// Uso: node tests/capturas.mjs [ruta ...]   (sin argumentos: la portada y el caso, en español)
+// Capturas locales del sitio (360, 768, 1280 y 1920 px; tema oscuro y claro) en design/refs/sitio/, que git ignora.
+// Por cada ancho y tema: portada, experiencia y proyectos (vista a la altura de cada sección) y la página completa.
+// Uso: node tests/capturas.mjs [ruta ...]   (sin argumentos: la portada en español)
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, VIEWPORTS, launch, loadPlaywright, open, startServer } from './lib.mjs';
@@ -7,7 +8,8 @@ import { ROOT, VIEWPORTS, launch, loadPlaywright, open, startServer } from './li
 const OUT = join(ROOT, 'design', 'refs', 'sitio');
 mkdirSync(OUT, { recursive: true });
 const rutas = process.argv.slice(2);
-const paginas = rutas.length ? rutas : ['/index.html', '/caso/esg-trazabilidad.html'];
+const paginas = rutas.length ? rutas : ['/index.html'];
+const SECCIONES = ['perfil', 'experiencia', 'proyectos'];
 
 const server = await startServer();
 const browser = await launch(loadPlaywright());
@@ -20,6 +22,12 @@ try {
         await page.waitForFunction(() => document.getAnimations().every((a) => a.effect.getComputedTiming().iterations === Infinity || a.playState === 'finished'));
         const nombre = `${path.replace(/^\//, '').replace(/[/.]/g, '-').replace(/-html$/, '')}-${viewport.width}-${scheme === 'dark' ? 'oscuro' : 'claro'}.png`;
         await page.screenshot({ path: join(OUT, nombre) });
+        for (const id of SECCIONES.slice(1)) {
+          if (!(await page.$('#' + id))) continue;
+          await page.evaluate((x) => document.getElementById(x).scrollIntoView(), id);
+          await page.screenshot({ path: join(OUT, nombre.replace('.png', `-${id}.png`)) });
+        }
+        await page.evaluate(() => window.scrollTo(0, 0));
         // Página completa: el documento largo del editor.
         await page.screenshot({ path: join(OUT, nombre.replace('.png', '-completa.png')), fullPage: true });
         await context.close();

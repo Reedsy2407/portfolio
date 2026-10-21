@@ -1,8 +1,8 @@
 # Portafolio — Angel Saenz
 
-Portafolio estático de un desarrollador backend (Java, Spring Boot, Python, Odoo y nube). Tiene una portada con perfil, habilidades y experiencia, y un caso de estudio, **esg-trazabilidad**, con dos entradas: una demo instantánea con datos simulados dentro del propio sitio y un enlace al sistema real. Está en español y en inglés.
+Portafolio estático de un desarrollador backend (Java, Spring Boot, Python, Odoo y nube). Es una sola página con perfil, habilidades, experiencia en línea de tiempo y proyectos: el destacado, **esg-trazabilidad** (con enlaces al sistema real, al código y a la documentación), y dos proyectos propios. Está en español y en inglés.
 
-El diseño imita un editor de código (explorador, pestañas, números de línea, minimapa y barra de estado). El contenido se lee entero sin JavaScript; el JavaScript solo añade mejoras (tema, navegación, filtro de la demo y datos de la barra de estado). No usa dependencias en producción.
+El diseño imita un editor de código (explorador, pestañas, números de línea, minimapa y barra de estado). El contenido se lee entero sin JavaScript; el JavaScript solo añade mejoras (tema, navegación, copiar el correo y datos de la barra de estado). No usa dependencias en producción.
 
 ## Verlo en local
 
@@ -18,8 +18,8 @@ Estructura:
 
 | Ruta | Contenido |
 |---|---|
-| `index.html`, `caso/esg-trazabilidad.html` | portada y caso de estudio (español) |
-| `en/index.html`, `en/case/esg-trazabilidad.html` | las mismas páginas en inglés |
+| `index.html` | portafolio (español) |
+| `en/index.html` | el portafolio en inglés |
 | `404.html` | página de error (bilingüe) |
 | `assets/` | CSS, JS, fuentes y favicon |
 | `scripts/build.mjs` | genera las cinco páginas HTML desde el contenido |
@@ -52,7 +52,8 @@ Qué comprueban:
 - **contraste**: AA en todo el texto, de ambos temas, contra el peor caso (resplandor entero y líneas de escaneo a su alfa máxima);
 - **maquetación**: sin desborde horizontal a 360 px, objetivos de 44 px, foco visible de 3 px, texto de 15 px o más y números de línea a toda la altura;
 - **movimiento**: `prefers-reduced-motion` (apaga partículas, glitch, tecleo, entrada y cursor parpadeante), partículas, glitch único, líneas ≤ 8 %, solo `opacity` y `transform`, botón de tema;
-- **contenido**: legible sin JavaScript, enlaces externos con `rel="noopener noreferrer"`, aviso previo al sistema real, demo sin red, anclas válidas, reglas de estilo del brief;
+- **contenido**: legible sin JavaScript, enlaces externos con `rel="noopener noreferrer"`, aviso previo al sistema real, anclas válidas, reglas de estilo del brief;
+- **pulido**: copiar el correo (con y sin JavaScript), iconos `aria-hidden`, secciones quitadas, disponibilidad única, enlaces de proyecto y legibilidad de la línea de tiempo (interlineado, ancho de línea, aire entre puestos);
 - **datos confirmados**: el CV nunca queda como enlace roto, ningún número parece un teléfono, el único correo es el confirmado y no se nombra a los clientes finales;
 - **CPU en reposo**: se mide y se informa (objetivo ≈ 2 % de un núcleo). Se mide en un navegador sin interfaz con rasterizado por software, así que no sustituye a una medición con GPU real.
 
@@ -69,6 +70,8 @@ Las fuentes se sirven desde `assets/fonts/`, con su licencia al lado (SIL Open F
 - Pixelify Sans 700 — © 2021 The Pixelify Sans Project Authors
 - Geist Mono 400 y 700 — © 2024 The Geist Project Authors
 - Instrument Sans 400 — © 2022 The Instrument Sans Project Authors
+
+Los iconos de LinkedIn, GitHub, correo y CV son glifos simplificados dibujados para este sitio (sin licencia de terceros).
 
 Paletas (solo se toman valores de color): tema oscuro con acentos de «One Dark» (Atom / One Dark Pro, licencia MIT) y tema claro con «GitHub Light» (Primer primitives, licencia MIT).
 

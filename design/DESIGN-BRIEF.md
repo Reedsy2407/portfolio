@@ -55,7 +55,7 @@
 2. Considerar **bajar las partículas de 20 a ≈ 12** si el consumo molesta en equipos reales.
 3. **Pruebas pendientes:** lector de pantalla real, Safari, Firefox (`light-dark()` y `@property` exigen navegadores de 2024 en adelante), dispositivo táctil real, Lighthouse y rendimiento con GPU real y en gama baja.
 4. Reproducir en el sitio real las comprobaciones automáticas de la maqueta (contraste contra el peor caso, orden y solapes, partículas, glitch, movimiento reducido, sin JS). Las cifras de este brief (contraste del peor caso, CPU, KB de la portada y del JS) salen de pruebas locales con Playwright que **no están versionadas**; en el sitio real se convierten en pruebas del proyecto.
-5. La maqueta tiene enlaces de demostración que se apuntan a sí mismos (**Ver CV**, las entradas de demo y el selector **EN**): en el sitio real apuntan al CV, a la demo, al sistema real y a la versión en inglés. Los enlaces de texto dentro de un párrafo quedan fuera de la exigencia de 44 px (como permite WCAG); los botones, etiquetas y la navegación la cumplen.
+5. La maqueta tenía enlaces de demostración que se apuntaban a sí mismos (**Ver CV**, las entradas de demo y el selector **EN**): en el sitio real apuntan al CV, al sistema real, al código, a la documentación y a la versión en inglés (la demo se retiró). Los enlaces de texto dentro de un párrafo quedan fuera de la exigencia de 44 px (como permite WCAG); los botones, etiquetas y la navegación la cumplen.
 
 ### Sitio real (etapa 2): decisiones aplicadas
 - Sin interruptor «Efectos» (se retiró a petición del humano): `prefers-reduced-motion` apaga partículas, glitch, tecleo, entrada escalonada y el cursor parpadeante; el brillo y las líneas quedan fijos. La barra de estado vuelve a medir 32 px sin controles.
@@ -63,13 +63,21 @@
 - Nombre en portada: «Angel Saenz». Inglés con páginas propias bajo `en/` (interruptor ES/EN en la barra de título). Fuente de las páginas: `scripts/build.mjs`.
 - Pruebas versionadas en `tests/` (peso, contraste del peor caso, maquetación, movimiento, contenido, CPU); las cifras de este brief se verifican ahí. CPU medida con el sitio real (mediana de 3 muestras): ≈ 2,1 % con efectos y ≈ 0,4 % con movimiento reducido (navegador sin interfaz, rasterizado por software; varía con la carga de la máquina, entre 2 y 4 % según el día).
 
+### Ronda de pulido (21 oct 2026)
+- Quitados: demo instantánea, página del caso, sección «Contacto» y el botón «Ver proyecto». La disponibilidad aparece una sola vez (ficha de la portada).
+- Portada: prompt de terminal propio (`cat saludo.txt`) sobre «hola, soy», fila de etiquetas de stack bajo el cargo (`// Java / Spring Boot`…, solo habilidades del CV), «Sobre mí» como botón principal y «Ver CV (PDF, tamaño)». Chip de correo que copia con aviso «Copiado» (`aria-live="polite"`); sin JavaScript es un enlace `mailto`.
+- Iconos de LinkedIn, GitHub, correo y CV: glifos simplificados propios, `aria-hidden`, de trazo como el resto del juego.
+- Experiencia: **línea de tiempo vertical** (fecha, «cargo · empresa» con la empresa en acento, contexto, ≤ 4 viñetas cortas y etiquetas de tecnologías), sin la puntuación ni los colores de sintaxis del JSON anterior. Columna de 560 px, interlineado 1,65 y 48 px entre puestos; el contraste AA de todo el texto lo comprueba `tests/contraste.test.mjs`.
+- De la referencia de estudio se tomó solo la idea de la línea de tiempo con nodos y la etiqueta de tecnologías por puesto; se rechazaron sus descripciones largas de bajo contraste.
+- Las partículas no cambian (12, misma posición y comportamiento).
+
 ### Defectos de D2 ya corregidos en D3
 - La etiqueta del botón de tema era siempre la misma y usaba `aria-pressed`: ahora dice la acción («Tema claro» en oscuro, «Tema oscuro» en claro) y no usa `aria-pressed`.
 - La línea actual del modo claro era un amarillo fuerte (`#fff8c5`): ahora es `#fffceb`.
 - El contenido quedaba demasiado a la derecha (120 px a 1280 y 440 px a 1920 de los números de línea): ahora 48 y ≈ 318 px.
 
 ## Contenido y alcance del sitio
-Portafolio estático de carga instantánea, sin backend propio. Contenido: perfil y habilidades, y **un solo proyecto destacado** (esg-trazabilidad) como caso de estudio con problema, arquitectura, decisiones, resultados y capturas. El proyecto ofrece dos entradas: **demo instantánea** con datos simulados (estática) y **sistema real**, con aviso de que puede tardar hasta un minuto en despertar y con su cuenta de demostración de un clic. Dos llamadas a la acción siempre visibles: **Contactar** (cliente) y **Ver CV / Ver proyecto** (reclutador). Gasto cero: sin dominio propio ni planes de pago.
+Portafolio estático de carga instantánea, sin backend propio, en **una sola página** (más su versión en inglés): perfil, sobre mí, habilidades, experiencia en línea de tiempo y proyectos. El proyecto destacado (esg-trazabilidad) es una tarjeta con tecnologías, periodo y tres acciones: **sistema real** (con aviso de hasta un minuto para despertar y su cuenta de demostración de un clic), **código** y **documentación**; debajo, dos proyectos propios. La demo instantánea y la página del caso de estudio se retiraron en la ronda de pulido (21 oct 2026). Llamadas a la acción siempre visibles en la portada: **Sobre mí** y **Ver CV**; el correo (chip que copia, más «Escribir»), LinkedIn y GitHub van como etiquetas con icono. Gasto cero: sin dominio propio ni planes de pago.
 
 ## Identidad y logo
 Hoy no hay logo oficial, así que no hay colores muestreados: la marca es **tipográfica**.
@@ -141,12 +149,12 @@ Reglas ya fijadas:
 - **Accesibilidad:** áreas táctiles de 44 px como mínimo, contraste AA calculado (no a ojo), foco visible y el color nunca como único canal.
 - **Un solo foco por pantalla.** Sin tarjetas idénticas en rejilla, sin tarjetas anidadas, sin degradados decorativos y sin fuentes sobreusadas (Inter, Roboto, Arial).
 - **Un elemento firma** consistente (el marco de editor con el nombre pixel), nunca repetido en todo a la vez; el brillo, las partículas y las líneas son ambiente y se rigen por las reglas de efectos.
-- **Datos de demostración** de 10 filas o más, no dos, y marcados como demostración.
+- **Datos de demostración**, si algún proyecto los lleva, de 10 filas o más y marcados como demostración (el sitio actual no tiene demo).
 
 ## Contenido
 - Español, registro cercano y directo, primera persona. Decisión de estilo (no norma local): fecha `20 oct 2026`, miles con espacio fino (`1 240`), decimales con coma.
-- **No se publican** nombres de empleadores o clientes, correos ni teléfonos mientras no estén confirmados: se escribe «[por confirmar]». Todo texto o cifra de ejemplo se marca como demostración.
-- Estados con una acción concreta: el sistema real dice cuánto puede tardar en despertar y ofrece la demo instantánea mientras tanto.
+- **No se publican** los nombres de los clientes finales ni teléfonos; empleadores y correo solo con la confirmación del humano (ya dada para HRF GROUP S.A.C., Hera Consulting SAC, COMPIPRO y el correo de contacto). Lo no confirmado se escribe «[por confirmar]». Todo texto o cifra de ejemplo se marca como demostración.
+- Estados con una acción concreta: el sistema real dice, antes del botón, cuánto puede tardar en despertar y que ofrece una cuenta demo de un clic.
 - Nunca «Lorem ipsum», «John Doe» ni saludos genéricos.
 
 ## Prohibido
@@ -177,9 +185,9 @@ Las páginas admiradas se guardan solo como material de estudio en un directorio
 | Portada | datos públicos del autor | nombre: Angel Sebastian Saenz Velarde; rol: Backend Developer (desarrollador backend); ciudad: Lima, Perú; stack: Java 21, Spring Boot, Python, Odoo, AWS Lambda, GCP, Azure DevOps |
 | Perfiles | confirmados y publicables por el humano | LinkedIn `https://www.linkedin.com/in/saenzdev/` y GitHub `https://github.com/Reedsy2407`, como etiquetas junto a los botones, con `rel="noopener noreferrer"` y un nombre accesible que avisa de la pestaña nueva (ya están en `design/direccion-d3/`) |
 | Experiencia, contacto, CV y empleadores | confirmados por el humano (21 oct 2026) | correo `saenzvelarde2006@gmail.com` (mailto); CV en `assets/cv/CV_Angel_Saenz.pdf` (se enlaza solo si existe); empleadores HRF GROUP S.A.C., Hera Consulting SAC y COMPIPRO. **No se publican** teléfono, dirección ni los clientes finales (se describen: «plataforma de e-commerce B2B», «sector educación», «CRM empresarial»); `tests/datos.test.mjs` y `tests/contenido.test.mjs` lo verifican. Disponibilidad: freelance a tiempo parcial, respuesta por correo en 24–48 h, zona horaria Lima (UTC−5). Caso esg-trazabilidad: proyecto académico (EFSRT, CIBERTEC), septiembre – octubre 2026, sin línea de rol. Siguen «[por confirmar]» solo las cifras y capturas de resultados |
-| Caso de estudio | esg-trazabilidad | problema, arquitectura, decisiones, resultados y capturas: **pendientes de confirmar**; las maquetas usan texto y cifras de demostración marcados como tales (lotes, proveedores, materiales, kg CO₂e, estado de auditoría) |
+| Proyecto destacado | esg-trazabilidad | datos reales del proyecto (descripción, tecnologías, periodo, enlaces al sistema, código y documentación); sin página de caso ni cifras de resultados |
 
-Las cifras y la tabla de lotes de las maquetas son de demostración y se sustituyen por las reales antes de publicar.
+Las cifras y la tabla de lotes eran solo de las maquetas; el sitio real no las usa.
 
 ### Decisiones sacadas de la referencia de estudio
 Se estudió un portafolio con estética de editor de código (solo decisiones de maquetación y de recursos del género, sin copiar nada). **Se tomó:** el marco de ventana con botones, la barra de actividad, las pestañas con punto de color, los números de línea a toda la altura con textura, el contenido pegado a 48 px de los números a 1280 px y en bloque centrado a 1920 px, las etiquetas tipo comentario, las ventanas pequeñas con botones, la barra de estado con datos de IDE, el selector de idioma compacto con el activo marcado (también por forma) y el interruptor de tema. **Se rechazó:** su texto secundario de bajo contraste y menor de 15 px, los objetivos táctiles de 20–24 px, el scroll interno, los datos de estado fijos y con emoji, el movimiento que no respeta `prefers-reduced-motion`, las estrellas y círculos pastel, la ilustración, la fuente de píxeles y la paleta rosa, el nombre de su tema, sus textos y sus nombres de archivo.
