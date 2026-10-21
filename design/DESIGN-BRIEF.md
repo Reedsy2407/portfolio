@@ -51,17 +51,17 @@
 - Carga y LCP medidos en local: ≈ 88 ms y 100–170 ms (no sustituye a Lighthouse).
 
 ### Requisitos para el sitio real
-1. **Interruptor «Efectos»** visible en la barra de estado (activa o apaga partículas, brillo y glitch), además de respetar `prefers-reduced-motion`; su estado se recuerda.
+1. ~~Interruptor «Efectos» en la barra de estado~~: **descartado el 21 oct 2026**; el apagado es solo por `prefers-reduced-motion`.
 2. Considerar **bajar las partículas de 20 a ≈ 12** si el consumo molesta en equipos reales.
 3. **Pruebas pendientes:** lector de pantalla real, Safari, Firefox (`light-dark()` y `@property` exigen navegadores de 2024 en adelante), dispositivo táctil real, Lighthouse y rendimiento con GPU real y en gama baja.
 4. Reproducir en el sitio real las comprobaciones automáticas de la maqueta (contraste contra el peor caso, orden y solapes, partículas, glitch, movimiento reducido, sin JS). Las cifras de este brief (contraste del peor caso, CPU, KB de la portada y del JS) salen de pruebas locales con Playwright que **no están versionadas**; en el sitio real se convierten en pruebas del proyecto.
 5. La maqueta tiene enlaces de demostración que se apuntan a sí mismos (**Ver CV**, las entradas de demo y el selector **EN**): en el sitio real apuntan al CV, a la demo, al sistema real y a la versión en inglés. Los enlaces de texto dentro de un párrafo quedan fuera de la exigencia de 44 px (como permite WCAG); los botones, etiquetas y la navegación la cumplen.
 
 ### Sitio real (etapa 2): decisiones aplicadas
-- Interruptor «Efectos» en la barra de estado (apaga partículas, brillo y glitch; se recuerda con `try/catch` sobre `localStorage`); su área táctil de 44 px crece sobre la barra de 32 px.
+- Sin interruptor «Efectos» (se retiró a petición del humano): `prefers-reduced-motion` apaga partículas, glitch, tecleo, entrada escalonada y el cursor parpadeante; el brillo y las líneas quedan fijos. La barra de estado vuelve a medir 32 px sin controles.
 - Partículas: **12** (8 símbolos y 4 puntos), solo ≥ 1280 px. Líneas de escaneo **≤ 8 %** en todo (la capa del nombre baja de 10 % a 8 % en oscuro; 7 % en claro).
 - Nombre en portada: «Angel Saenz». Inglés con páginas propias bajo `en/` (interruptor ES/EN en la barra de título). Fuente de las páginas: `scripts/build.mjs`.
-- Pruebas versionadas en `tests/` (peso, contraste del peor caso, maquetación, movimiento, contenido, CPU); las cifras de este brief se verifican ahí. CPU medida con el sitio real: ≈ 2,3 % con efectos, ≈ 2,1 % con «Efectos» apagado y ≈ 0,1 % con movimiento reducido (navegador sin interfaz, rasterizado por software).
+- Pruebas versionadas en `tests/` (peso, contraste del peor caso, maquetación, movimiento, contenido, CPU); las cifras de este brief se verifican ahí. CPU medida con el sitio real (mediana de 3 muestras): ≈ 2,1 % con efectos y ≈ 0,4 % con movimiento reducido (navegador sin interfaz, rasterizado por software; varía con la carga de la máquina, entre 2 y 4 % según el día).
 
 ### Defectos de D2 ya corregidos en D3
 - La etiqueta del botón de tema era siempre la misma y usaba `aria-pressed`: ahora dice la acción («Tema claro» en oscuro, «Tema oscuro» en claro) y no usa `aria-pressed`.
@@ -176,7 +176,7 @@ Las páginas admiradas se guardan solo como material de estudio en un directorio
 |---|---|---|
 | Portada | datos públicos del autor | nombre: Angel Sebastian Saenz Velarde; rol: Backend Developer (desarrollador backend); ciudad: Lima, Perú; stack: Java 21, Spring Boot, Python, Odoo, AWS Lambda, GCP, Azure DevOps |
 | Perfiles | confirmados y publicables por el humano | LinkedIn `https://www.linkedin.com/in/saenzdev/` y GitHub `https://github.com/Reedsy2407`, como etiquetas junto a los botones, con `rel="noopener noreferrer"` y un nombre accesible que avisa de la pestaña nueva (ya están en `design/direccion-d3/`) |
-| Experiencia, contacto, CV y empleadores | pendiente de confirmar | correo, CV y nombres de empleadores o clientes: todo «[por confirmar]» hasta que el humano lo dé |
+| Experiencia, contacto, CV y empleadores | confirmados por el humano (21 oct 2026) | correo `saenzvelarde2006@gmail.com` (mailto); CV en `assets/cv/CV_Angel_Saenz.pdf` (se enlaza solo si existe); empleadores HRF GROUP S.A.C., Hera Consulting SAC y COMPIPRO. **No se publican** teléfono, dirección ni los clientes finales (se describen: «plataforma de e-commerce B2B», «sector educación», «CRM empresarial»); `tests/datos.test.mjs` y `tests/contenido.test.mjs` lo verifican |
 | Caso de estudio | esg-trazabilidad | problema, arquitectura, decisiones, resultados y capturas: **pendientes de confirmar**; las maquetas usan texto y cifras de demostración marcados como tales (lotes, proveedores, materiales, kg CO₂e, estado de auditoría) |
 
 Las cifras y la tabla de lotes de las maquetas son de demostración y se sustituyen por las reales antes de publicar.

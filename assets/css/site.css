@@ -1644,35 +1644,6 @@ dialog a:focus-visible {
 
 /* ── Sitio real: añadidos a D3 ───────────────────── */
 
-/* Interruptor «Efectos» (barra de estado). Apaga partículas, brillo y glitch; se recuerda en este navegador.
-   El área táctil es de 44 px: crece hacia arriba y el texto queda centrado en la barra de 32 px. */
-.status .st-btn {
-  align-self: flex-end;
-  min-height: var(--touch);
-  min-width: var(--touch);
-  padding: var(--space-3) var(--space-2) 0;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  color: inherit;
-  font: inherit;
-  line-height: var(--space-5);
-  cursor: pointer;
-}
-.status .st-btn:hover {
-  text-decoration: underline;
-  text-underline-offset: var(--space-1);
-}
-:root[data-fx='off'] {
-  --glow-c: transparent;
-  --fx-glow: none;
-}
-:root[data-fx='off'] .fx,
-:root[data-fx='off'] .nm::before,
-:root[data-fx='off'] .nm::after {
-  display: none !important;
-}
-
 /* Aviso previo al sistema real y rótulo de datos simulados. */
 .notice {
   margin-block: var(--space-4);
@@ -1748,6 +1719,29 @@ dialog a:focus-visible {
   font-family: var(--font-mono);
   font-size: var(--t-note);
   color: var(--ink-soft);
+}
+.json dd .facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.json dd .facts li {
+  margin: 0 0 var(--space-1);
+  padding: 0;
+  border-left: 0;
+  color: var(--c-str);
+  font-family: var(--font-mono);
+}
+.json dd .facts li::before {
+  content: '- ' / '';
+  color: var(--ink-soft);
+}
+.json.wide {
+  max-width: var(--col-wide);
+}
+.sz {
+  color: inherit;
+  font-weight: 400;
 }
 .entry .btn {
   justify-self: start;

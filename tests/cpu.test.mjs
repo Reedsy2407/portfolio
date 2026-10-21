@@ -6,7 +6,9 @@ import { VIEWPORTS, open } from './lib.mjs';
 
 export const name = 'CPU en reposo (portada, 1280 px)';
 
-const VENTANA_MS = 8000; // ventana de medición: el consumo se promedia en tiempo, no es una espera de sincronización
+const VENTANA_MS = 6000;
+/* El consumo varía con la carga de la máquina: se informa la mediana y el rango de 3 muestras. */
+const MUESTRAS = 3;
 const LIMITE = 10;
 
 async function cpuTotal(cdp) {
@@ -30,12 +32,19 @@ async function medir(browser, base, opts) {
   return pct;
 }
 
+const mediana = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
+const resumen = (xs) => `mediana ${mediana(xs).toFixed(1)} % (rango ${Math.min(...xs).toFixed(1)}–${Math.max(...xs).toFixed(1)} %, ${xs.length} muestras)`;
+
+async function muestras(browser, base, opts) {
+  const xs = [];
+  for (let i = 0; i < MUESTRAS; i++) xs.push(await medir(browser, base, opts));
+  return xs;
+}
+
 export async function run({ browser, base, report }) {
-  const conEfectos = await medir(browser, base, {});
-  const sinEfectos = await medir(browser, base, { init: () => { try { localStorage.setItem('efectos', 'no'); } catch {} } });
-  const reducido = await medir(browser, base, { reduced: 'reduce' });
-  report.info('CPU en reposo con efectos', `${conEfectos.toFixed(1)} % de un núcleo (objetivo ≈ 2 %)`);
-  report.info('CPU en reposo con «Efectos» apagado', `${sinEfectos.toFixed(1)} %`);
-  report.info('CPU en reposo con movimiento reducido', `${reducido.toFixed(1)} %`);
-  report.check(`CPU en reposo con efectos por debajo del ${LIMITE} %`, conEfectos < LIMITE, `${conEfectos.toFixed(1)} %`);
+  const conEfectos = await muestras(browser, base, {});
+  const reducido = await muestras(browser, base, { reduced: 'reduce' });
+  report.info('CPU en reposo con efectos (objetivo ≈ 2 % de un núcleo)', resumen(conEfectos));
+  report.info('CPU en reposo con movimiento reducido', resumen(reducido));
+  report.check(`CPU en reposo con efectos por debajo del ${LIMITE} % (mediana)`, mediana(conEfectos) < LIMITE, `${mediana(conEfectos).toFixed(1)} %`);
 }

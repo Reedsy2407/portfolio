@@ -1,6 +1,6 @@
 // Genera las páginas estáticas (ES y EN) a partir del contenido de este archivo.
 // Uso: node scripts/build.mjs   (solo Node; no hay dependencias ni se ejecuta en producción)
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -12,6 +12,7 @@ const URL_SISTEMA = 'https://esg-frontend-egcf.onrender.com';
 const URL_DOCS = 'https://reedsy2407.github.io/esg-trazabilidad/';
 const URL_CODIGO = 'https://github.com/Reedsy2407/esg-trazabilidad';
 const NOMBRE = 'Angel Saenz';
+const CORREO = 'saenzvelarde2006@gmail.com';
 
 /* Rutas de cada página, relativas a la raíz del sitio. */
 const PAGES = {
@@ -24,14 +25,14 @@ const UI = {
     lang: 'es', skip: 'Saltar al contenido', files: 'Archivos', themeA: 'Tema claro', themeB: 'Tema oscuro',
     langLabel: 'Idioma', explorer: 'Explorador', navFiles: 'Archivos del portafolio', tabs: 'Archivos abiertos',
     search: 'Buscar archivo (Ctrl K)', statusBar: 'Barra de estado', errors: 'errores: ', goTo: 'Ir a un archivo',
-    filter: 'Filtrar archivos', type: 'escribe para filtrar', fx: 'Efectos', fxOn: 'sí', fxOff: 'no',
+    filter: 'Filtrar archivos', type: 'escribe para filtrar',
     newTab: '(se abre en una pestaña nueva)', user: 'visitante@portafolio', todo: '[por confirmar]',
   },
   en: {
     lang: 'en', skip: 'Skip to content', files: 'Files', themeA: 'Light theme', themeB: 'Dark theme',
     langLabel: 'Language', explorer: 'Explorer', navFiles: 'Portfolio files', tabs: 'Open files',
     search: 'Find file (Ctrl K)', statusBar: 'Status bar', errors: 'errors: ', goTo: 'Go to file',
-    filter: 'Filter files', type: 'type to filter', fx: 'Effects', fxOn: 'on', fxOff: 'off',
+    filter: 'Filter files', type: 'type to filter',
     newTab: '(opens in a new tab)', user: 'visitor@portfolio', todo: '[to be confirmed]',
   },
 };
@@ -112,7 +113,7 @@ function frame({ lang, file, root, title, desc, tabs, tree, sections, gutterRows
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${title}</title>
 <meta name="description" content="${desc}">
-<script>var d=document.documentElement;try{var th=localStorage.getItem('tema');if(th==='claro'||th==='oscuro')d.dataset.theme=th;if(localStorage.getItem('efectos')==='no')d.dataset.fx='off'}catch(e){}d.classList.add('js');window.__e=0;addEventListener('error',function(){window.__e++},true)</script>
+<script>var d=document.documentElement;try{var th=localStorage.getItem('tema');if(th==='claro'||th==='oscuro')d.dataset.theme=th;}catch(e){}d.classList.add('js');window.__e=0;addEventListener('error',function(){window.__e++},true)</script>
 <link rel="icon" href="${root}assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="${root}assets/fonts/instrument-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="${root}assets/fonts/pixelify-sans-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -173,7 +174,6 @@ ${sections.join('\n')}
   <span id="m-pos">Ln 1, Col 1</span>
   <span class="opt" id="m-carga"></span>
   <span class="opt" id="m-lcp"></span>
-  <button class="st-btn" id="fx-toggle" type="button" aria-pressed="true" data-on="${u.fxOn}" data-off="${u.fxOff}" hidden><span>${u.fx}: </span><span id="fx-state" aria-hidden="true">${u.fxOn}</span></button>
 </footer>
 
 <dialog id="cmd" aria-labelledby="cmd-t">
@@ -217,37 +217,114 @@ const PROJECT_TEXT = {
 
 const CONTACTO_LEAD = { es: '¿Tienes un servicio por construir o un equipo que reforzar?', en: 'Have a service to build or a team to reinforce?' };
 
-function contacto(lang) {
-  const u = UI[lang];
+/* CV: se enlaza solo si el archivo existe al generar el sitio; si no, queda el marcador y ningún enlace. */
+const CV_RUTA = 'assets/cv/CV_Angel_Saenz.pdf';
+const CV_BYTES = existsSync(join(ROOT, CV_RUTA)) ? statSync(join(ROOT, CV_RUTA)).size : null;
+const cvTamano = () => (CV_BYTES < 1024 * 1024 ? `${Math.max(1, Math.round(CV_BYTES / 1024))} KB` : `${(CV_BYTES / 1024 / 1024).toFixed(1)} MB`);
+const cvLink = (lang, root, cls) => {
+  /* El nombre accesible empieza por el texto visible (WCAG 2.5.3). */
+  const aria = t(lang, `Ver CV (PDF, ${CV_BYTES === null ? '' : cvTamano()}) de ${NOMBRE} ${UI[lang].newTab}`,
+    `View CV (PDF, ${CV_BYTES === null ? '' : cvTamano()}) by ${NOMBRE} ${UI[lang].newTab}`);
+  return `<a class="${cls}" href="${root}${CV_RUTA}" target="_blank" rel="noopener noreferrer" aria-label="${aria}">${t(lang, 'Ver CV', 'View CV')} <span class="sz">(PDF, ${cvTamano()})</span>${ic('i-ext', 16)}</a>`;
+};
+const cvTodo = (lang) => `<span class="todo">${t(lang, '[CV por confirmar]', '[CV to be confirmed]')}</span>`;
+const mailChip = () => `<a class="tag" href="mailto:${CORREO}">${CORREO}</a>`;
+
+function contacto(lang, root) {
   const nombreLi = (href, text, label) => `<p class="mono"><span class="cmd">open</span> ${ext(href, label, text, lang)}</p>`;
   return section('contacto', 'contacto.sh', 'sh', 'Shell', 'shell', 'f-con', `  <h2 class="title-px" id="f-con">${t(lang, '¿Hablamos?', 'Shall we talk?')}</h2>
   <p class="mono"><span class="cm">#!/bin/sh</span></p>
   <p class="lead">${CONTACTO_LEAD[lang]}</p>
-  <p class="mono"><span class="cmd">echo</span> <span class="st">"${t(lang, 'correo', 'email')}: </span><span class="todo">${t(lang, '[correo por confirmar]', '[email to be confirmed]')}</span><span class="st">"</span></p>
-  <p class="mono"><span class="cmd">echo</span> <span class="st">"cv: </span><span class="todo">${u.todo}</span><span class="st">"</span></p>
+  <p class="mono"><span class="cmd">echo</span> <span class="st">"${t(lang, 'correo', 'email')}: </span><a href="mailto:${CORREO}">${CORREO}</a><span class="st">"</span></p>
+  <p class="mono"><span class="cmd">echo</span> <span class="st">"cv: </span>${CV_BYTES === null ? cvTodo(lang) : `<a href="${root}${CV_RUTA}" target="_blank" rel="noopener noreferrer" aria-label="CV_Angel_Saenz.pdf (PDF, ${cvTamano()}) ${UI[lang].newTab}">CV_Angel_Saenz.pdf (PDF, ${cvTamano()})</a>`}<span class="st">"</span></p>
   ${nombreLi(URL_LINKEDIN, 'linkedin.com/in/saenzdev', `LinkedIn ${t(lang, 'de', 'of')} ${NOMBRE}`)}
   ${nombreLi(URL_GITHUB, 'github.com/Reedsy2407', `GitHub ${t(lang, 'de', 'of')} ${NOMBRE}`)}
-  <div class="cta">${ext(URL_LINKEDIN, `${t(lang, 'Escribir por LinkedIn', 'Write on LinkedIn')}`, t(lang, 'Escribir por LinkedIn', 'Write on LinkedIn'), lang, 'btn primary')}</div>`, 'sh');
+  <div class="cta"><a class="btn primary" href="mailto:${CORREO}">${t(lang, 'Escribir por correo', 'Write by email')}</a>${ext(URL_LINKEDIN, t(lang, 'Escribir por LinkedIn', 'Write on LinkedIn'), t(lang, 'Escribir por LinkedIn', 'Write on LinkedIn'), lang, 'btn')}${CV_BYTES === null ? '' : cvLink(lang, root, 'btn')}</div>`, 'sh');
 }
 
 /* ── Portada ───────────────────────────────────────── */
-function homeSections(lang, hrefs) {
+const EXPERIENCIA = [
+  {
+    empresa: 'HRF GROUP S.A.C.',
+    cargo: ['Desarrollador backend Java', 'Java backend developer'],
+    periodo: ['abril 2026 – actualidad (remoto)', 'April 2026 – present (remote)'],
+    contexto: ['plataforma de e-commerce B2B', 'B2B e-commerce platform'],
+    hechos: [
+      ['Microservicios en Java 21 y Spring Boot 3.x con arquitectura hexagonal.', 'Microservices on Java 21 and Spring Boot 3.x with hexagonal architecture.'],
+      ['Corrección de errores de cálculo de precios y promociones, rastreando la causa raíz entre capas.', 'Fixed pricing and promotion calculation bugs by tracing the root cause across layers.'],
+      ['Endpoints batch para consulta masiva de stock entre microservicios.', 'Batch endpoints for bulk stock queries between microservices.'],
+      ['PostgreSQL multi-schema y Liquibase.', 'Multi-schema PostgreSQL and Liquibase.'],
+      ['Despliegues a QA en Kubernetes con ArgoCD y hotfixes controlados.', 'QA deployments on Kubernetes with ArgoCD and controlled hotfixes.'],
+      ['Monitoreo con Dynatrace, Azure DevOps y revisiones de código.', 'Monitoring with Dynatrace, Azure DevOps and code reviews.'],
+    ],
+  },
+  {
+    empresa: 'HRF GROUP S.A.C.',
+    cargo: ['Desarrollador backend Java en AWS', 'Java backend developer on AWS'],
+    periodo: ['dic 2025 – mar 2026', 'Dec 2025 – Mar 2026'],
+    contexto: ['sector educación', 'education sector'],
+    hechos: [
+      ['Lambdas en Java 21 con arquitectura hexagonal.', 'Lambdas in Java 21 with hexagonal architecture.'],
+      ['S3 con enlaces de descarga seguros.', 'S3 with secure download links.'],
+      ['Step Functions con registro de ejecuciones en DynamoDB.', 'Step Functions with execution logging in DynamoDB.'],
+      ['Cambios en MySQL.', 'MySQL changes.'],
+    ],
+  },
+  {
+    empresa: 'HRF GROUP S.A.C.',
+    cargo: ['Desarrollador backend', 'Backend developer'],
+    periodo: ['sep – dic 2025', 'Sep – Dec 2025'],
+    contexto: ['CRM empresarial', 'enterprise CRM'],
+    hechos: [
+      ['.NET Core y Python.', '.NET Core and Python.'],
+      ['APIs REST y GraphQL.', 'REST and GraphQL APIs.'],
+      ['Procesamiento masivo de CSV.', 'Bulk CSV processing.'],
+      ['Repository y Unit of Work con Entity Framework.', 'Repository and Unit of Work with Entity Framework.'],
+    ],
+  },
+  {
+    empresa: 'Hera Consulting SAC',
+    cargo: ['Analista programador Java junior', 'Junior Java programmer analyst'],
+    periodo: ['julio 2025 – actualidad (jornada parcial)', 'July 2025 – present (part-time)'],
+    hechos: [
+      ['Aplicaciones empresariales en Java y Python (Spring MVC, JSP, Servlets).', 'Enterprise applications in Java and Python (Spring MVC, JSP, Servlets).'],
+      ['Módulos de Odoo con integraciones de WhatsApp e IA.', 'Odoo modules with WhatsApp and AI integrations.'],
+      ['Oracle y PostgreSQL.', 'Oracle and PostgreSQL.'],
+      ['Angular y TypeScript.', 'Angular and TypeScript.'],
+    ],
+  },
+  {
+    empresa: 'COMPIPRO',
+    cargo: ['Prácticas', 'Internship'],
+    periodo: ['feb – may 2025', 'Feb – May 2025'],
+    hechos: [
+      ['Módulos de logística, asistencias y CRM.', 'Logistics, attendance and CRM modules.'],
+      ['Chat en tiempo real con WebSockets (Workerman).', 'Real-time chat with WebSockets (Workerman).'],
+      ['PHP, JavaScript y MVC.', 'PHP, JavaScript and MVC.'],
+    ],
+  },
+];
+
+function homeSections(lang, hrefs, root) {
   const u = UI[lang];
   const perfil = section('perfil', t(lang, 'perfil.md', 'profile.md'), 'md', 'Markdown', 'markdown', 'f-perfil', `  <p class="prompt"><span class="ps">${u.user}</span><span class="punc">:~$</span> <span class="typed">whoami</span><i class="caret" aria-hidden="true"></i></p>
   <p class="mono rise" style="--i:1"><span class="cm">${t(lang, '// hola, soy', "// hi, I'm")}</span></p>
   <h1 class="name" id="f-perfil"><span class="nm" data-text="${NOMBRE}">${NOMBRE}</span></h1>
   <p class="role rise" style="--i:2">// Backend Developer</p>
   <p class="lead">${t(lang,
-    'Desarrollador backend en Lima. Construyo microservicios con Java y Spring Boot, trabajo con Python y Odoo en sistemas ERP y despliego en la nube con AWS Lambda, GCP y Azure DevOps.',
-    'Backend developer based in Lima. I build microservices with Java and Spring Boot, work with Python and Odoo on ERP systems, and deploy to the cloud with AWS Lambda, GCP and Azure DevOps.')}</p>
+    'Desarrollador backend en Lima. Construyo microservicios con Java y Spring Boot, trabajo con servicios de AWS y despliego en Kubernetes y Azure DevOps.',
+    'Backend developer based in Lima. I build microservices with Java and Spring Boot, work with AWS services and deploy on Kubernetes and Azure DevOps.')}</p>
   <div class="cta rise" style="--i:3">
     <a class="btn primary" href="#contacto">${t(lang, 'Contactar', 'Get in touch')}</a>
     <a class="btn" href="${hrefs.caso}">${t(lang, 'Ver proyecto', 'View project')}</a>
+    ${CV_BYTES === null ? '' : cvLink(lang, root, 'btn')}
   </div>
   <div class="links rise" style="--i:4">
     ${chip(URL_LINKEDIN, 'LinkedIn', 'LinkedIn', lang)}
     ${chip(URL_GITHUB, 'GitHub', 'GitHub', lang)}
+    ${mailChip()}
   </div>
+  ${CV_BYTES === null ? `<p class="note">CV: ${cvTodo(lang)}</p>` : ''}
   <div class="fm rise" style="--i:5">
     <p aria-hidden="true">---</p>
     <dl>
@@ -261,36 +338,38 @@ function homeSections(lang, hrefs) {
 
   const sobre = section('sobre-mi', t(lang, 'sobre-mi.md', 'about.md'), 'md', 'Markdown', 'markdown', 'f-sob', `  <h2 class="title-px" id="f-sob">${t(lang, 'Sobre mí', 'About me')}</h2>
   <p class="lead">${t(lang,
-    'Trabajo en el lado del servidor: servicios que otras personas usan sin verlos. Mi base es Java y Spring Boot, y cuando el problema es de ERP me muevo en Python y Odoo.',
-    'I work on the server side: services other people use without seeing them. My base is Java and Spring Boot, and when the problem is ERP I move to Python and Odoo.')}</p>
+    'Soy desarrollador backend en Lima. Trabajo con Java y Spring Boot, microservicios y arquitectura hexagonal, con servicios de AWS y despliegues en Kubernetes y Azure DevOps.',
+    'I am a backend developer in Lima. I work with Java and Spring Boot, microservices and hexagonal architecture, with AWS services and deployments on Kubernetes and Azure DevOps.')}</p>
   <p>${t(lang,
-    'Estudio Ingeniería de Sistemas Informáticos en CIBERTEC. Mi inglés es C1 avanzado (EF SET) y tengo la certificación Scrum Fundamentals Certified.',
-    "I'm studying Computer Systems Engineering at CIBERTEC. My English is advanced C1 (EF SET) and I hold the Scrum Fundamentals Certified certification.")}</p>
+    'He pasado por proyectos de e-commerce B2B, educación, logística y CRM: APIs, automatización de procesos y trabajo en equipos ágiles. Me interesan el código limpio y las buenas prácticas.',
+    'I have worked on B2B e-commerce, education, logistics and CRM projects: APIs, process automation and agile teamwork. I care about clean code and good practices.')}</p>
   ${win(t(lang, 'formacion.ts', 'education.ts'), `<ul class="tags">
-      ${row(t(lang, 'estudios', 'studies'), t(lang, 'Ingeniería de Sistemas Informáticos · CIBERTEC', 'Computer Systems Engineering · CIBERTEC'))}
-      ${row(t(lang, 'idioma', 'language'), t(lang, 'Inglés C1 avanzado · EF SET', 'English C1 advanced · EF SET'))}
-      ${row(t(lang, 'certificado', 'certified'), 'Scrum Fundamentals Certified')}
+      ${row(t(lang, 'estudios', 'studies'), t(lang, 'Ingeniería de Sistemas · Cibertec · julio 2026 – actualidad', 'Systems Engineering · Cibertec · July 2026 – present'))}
+      ${row(t(lang, 'técnica', 'technical'), t(lang, 'Técnica en Computación e Informática · Cibertec · 2023 – 2025', 'Technical degree in Computing and Informatics · Cibertec · 2023 – 2025'))}
+      ${row(t(lang, 'idiomas', 'languages'), t(lang, 'español nativo · inglés intermedio-avanzado (EF SET 64/100, C1 Advanced)', 'native Spanish · upper-intermediate to advanced English (EF SET 64/100, C1 Advanced)'))}
+      ${row(t(lang, 'certificado', 'certified'), 'Scrum Fundamentals Certified (SFC)')}
     </ul>`)}`);
 
   const hab = section('habilidades', t(lang, 'habilidades.ts', 'skills.ts'), 'ts', 'TypeScript', 'typescript', 'f-hab', `  <h2 class="title-px" id="f-hab">${t(lang, 'Habilidades', 'Skills')}</h2>
-  <p class="mono"><span class="cm">${t(lang, '// el color indica el rol: clave, valor, pendiente', '// color shows the role: key, value, pending')}</span></p>
+  <p class="mono"><span class="cm">${t(lang, '// el color indica el rol: clave y valor', '// color shows the role: key and value')}</span></p>
   ${win('stack.ts', `<ul class="tags">
-      ${row('backend', t(lang, 'Java 21 · Spring Boot (microservicios)', 'Java 21 · Spring Boot (microservices)'))}
-      ${row('erp', 'Python · Odoo')}
-      ${row(t(lang, 'nube', 'cloud'), 'AWS Lambda · GCP')}
-      ${row(t(lang, 'entrega', 'delivery'), 'Azure DevOps')}
-      ${row(t(lang, 'método', 'method'), 'Scrum')}
-      ${row(t(lang, 'otras', 'other'), todo(lang))}
+      ${row('backend java', t(lang, 'Java 21 · Spring Boot / MVC / Security · JPA/Hibernate · Maven · hexagonal · microservicios', 'Java 21 · Spring Boot / MVC / Security · JPA/Hibernate · Maven · hexagonal · microservices'))}
+      ${row('aws', 'Lambda · S3 · Step Functions · API Gateway · DynamoDB · CloudWatch · Cognito')}
+      ${row(t(lang, 'otros backend', 'other backend'), '.NET Core · Python · Node.js · REST · GraphQL · Odoo')}
+      ${row('frontend', 'Angular 15+ · TypeScript · JavaScript · HTML5 · CSS3')}
+      ${row(t(lang, 'bases de datos', 'databases'), 'PostgreSQL multi-schema · MySQL · Oracle PL/SQL · SQL Server · MongoDB')}
+      ${row('devops', 'Kubernetes · ArgoCD · Azure DevOps · Liquibase · Dynatrace · GCP Pub/Sub')}
+      ${row(t(lang, 'herramientas', 'tools'), 'Git · Swagger/OpenAPI · Postman · Scrum')}
     </ul>`)}`);
 
-  const dl = (k1, v1, k2, v2, k3, v3, last) => `<li><span class="punc" aria-hidden="true">{</span><dl><dt>${k1}</dt><dd>${v1}</dd><dt>${k2}</dt><dd>${v2}</dd><dt>${k3}</dt><dd>${v3}</dd></dl><span class="punc" aria-hidden="true">}${last ? '' : ','}</span></li>`;
+  const pair = (k, v) => `<dt>${k}</dt><dd>${v}</dd>`;
+  const entrada = (e, last) => `<li><span class="punc" aria-hidden="true">{</span><dl>${pair(t(lang, 'empresa', 'company'), e.empresa)}${pair(t(lang, 'cargo', 'role'), t(lang, ...e.cargo))}${pair(t(lang, 'periodo', 'period'), t(lang, ...e.periodo))}${e.contexto ? pair(t(lang, 'contexto', 'context'), t(lang, ...e.contexto)) : ''}${pair(t(lang, 'hechos', 'work'), `<ul class="facts">${e.hechos.map((h) => `<li>${t(lang, ...h)}</li>`).join('')}</ul>`)}</dl><span class="punc" aria-hidden="true">}${last ? '' : ','}</span></li>`;
   const exp = section('experiencia', t(lang, 'experiencia.json', 'experience.json'), 'json', 'JSON', 'json', 'f-exp', `  <h2 class="title-px" id="f-exp">${t(lang, 'Experiencia', 'Experience')}</h2>
-  <p class="mono"><span class="cm">${t(lang, '// descripciones genéricas; el resto se confirma', '// generic descriptions; the rest is to be confirmed')}</span></p>
-  <div class="json">
+  <p class="mono"><span class="cm">${t(lang, '// de la más reciente a la más antigua; los clientes finales no se nombran', '// most recent first; end clients are not named')}</span></p>
+  <div class="json wide">
     <p class="mono"><span class="punc" aria-hidden="true">[</span></p>
     <ol>
-      ${dl(t(lang, 'empleador', 'employer'), t(lang, 'plataforma de e-commerce', 'e-commerce platform'), t(lang, 'cargo', 'role'), todo(lang), t(lang, 'periodo', 'period'), todo(lang), false)}
-      ${dl(t(lang, 'empleador', 'employer'), t(lang, 'consultora de ERP', 'ERP consultancy'), t(lang, 'cargo', 'role'), todo(lang), t(lang, 'periodo', 'period'), todo(lang), true)}
+      ${EXPERIENCIA.map((e, i) => entrada(e, i === EXPERIENCIA.length - 1)).join('\n      ')}
     </ol>
     <p class="mono"><span class="punc" aria-hidden="true">]</span></p>
   </div>`);
@@ -299,9 +378,14 @@ function homeSections(lang, hrefs) {
   <p class="mono"><span class="cm"># esg-trazabilidad</span></p>
   <p class="lead">${PROJECT_TEXT[lang]}</p>
   ${entradas(lang, hrefs.demo)}
-  <p><a href="${hrefs.caso}">${t(lang, 'Leer el caso de estudio', 'Read the case study')}</a></p>`);
+  <p><a href="${hrefs.caso}">${t(lang, 'Leer el caso de estudio', 'Read the case study')}</a></p>
+  <p class="mono"><span class="cm">${t(lang, '// otros proyectos propios', '// other personal projects')}</span></p>
+  ${win(t(lang, 'otros-proyectos.ts', 'other-projects.ts'), `<ul class="tags">
+      ${row('Portal Laboral', 'Spring Boot · Spring Security con JWT · Angular · MySQL')}
+      ${row('Helpcore', t(lang, 'microservicios con API Gateway, autenticación, config server y notificaciones con Redis', 'microservices with API Gateway, authentication, config server and Redis notifications'))}
+    </ul>`)}`);
 
-  return [perfil, sobre, hab, exp, proyecto, contacto(lang)];
+  return [perfil, sobre, hab, exp, proyecto, contacto(lang, root)];
 }
 
 /* ── Caso de estudio ───────────────────────────────── */
@@ -340,7 +424,7 @@ function demoHtml(lang) {
       <p class="cert" id="demo-resumen" data-tpl="${tpl}">${tpl.replace('{n}', DEMO_ROWS.length).replace('{kg}', thin(total))}</p>`, true, sim);
 }
 
-function casoSections(lang, hrefs) {
+function casoSections(lang, hrefs, root) {
   const u = UI[lang];
   const resumen = section('resumen', t(lang, 'resumen.md', 'summary.md'), 'md', 'Markdown', t(lang, 'caso de estudio', 'case study'), 'f-res0', `  <p class="prompt"><span class="ps">${u.user}</span><span class="punc">:~$</span> <span class="typed" style="--ch:8">${t(lang, 'cat caso', 'cat case')}</span><i class="caret" aria-hidden="true"></i></p>
   <p class="mono rise" style="--i:1"><span class="cm">${t(lang, '// proyecto destacado', '// featured project')}</span></p>
@@ -401,7 +485,7 @@ function casoSections(lang, hrefs) {
     <p class="mono"><span class="punc" aria-hidden="true">}</span></p>
   </div>`);
 
-  return [resumen, ent, demo, arq, dec, enl, resultados, contacto(lang)];
+  return [resumen, ent, demo, arq, dec, enl, resultados, contacto(lang, root)];
 }
 
 /* ── 404 ───────────────────────────────────────────── */
@@ -434,17 +518,17 @@ for (const lang of ['es', 'en']) {
     let title;
     let desc;
     if (kind === 'home') {
-      sections = homeSections(lang, hrefs);
+      sections = homeSections(lang, hrefs, root);
       tabs = [['perfil', t(lang, 'perfil.md', 'profile.md'), 'md'], ['sobre-mi', t(lang, 'sobre-mi.md', 'about.md'), 'md'], ['habilidades', t(lang, 'habilidades.ts', 'skills.ts'), 'ts'],
         ['experiencia', t(lang, 'experiencia.json', 'experience.json'), 'json'], ['proyecto', 'esg-trazabilidad.md', 'md'], ['contacto', 'contacto.sh', 'sh']]
         .map(([id, name, type]) => ({ href: `#${id}`, name, type }));
       tree = [{ dir: 'portafolio', items: tabs }, { dir: t(lang, 'proyectos', 'projects'), items: [{ href: hrefs.caso, name: 'esg-trazabilidad/', type: 'md' }] }];
-      gutterRows = 200;
+      gutterRows = 290;
       title = `${NOMBRE} — Backend Developer`;
       desc = t(lang, 'Portafolio de Angel Saenz, desarrollador backend en Lima: Java, Spring Boot, Python, Odoo y nube. Caso de estudio: esg-trazabilidad.',
         'Portfolio of Angel Saenz, backend developer in Lima: Java, Spring Boot, Python, Odoo and cloud. Case study: esg-trazabilidad.');
     } else {
-      sections = casoSections(lang, hrefs);
+      sections = casoSections(lang, hrefs, root);
       tabs = [['resumen', t(lang, 'resumen.md', 'summary.md'), 'md'], ['entradas', 'entradas.sh', 'sh'], ['demo', 'demo.csv', 'csv'], ['arquitectura', t(lang, 'arquitectura.md', 'architecture.md'), 'ts'],
         ['decisiones', t(lang, 'decisiones.md', 'decisions.md'), 'md'], ['enlaces', t(lang, 'enlaces.md', 'links.md'), 'md'], ['resultados', t(lang, 'resultados.json', 'results.json'), 'json'], ['contacto', 'contacto.sh', 'sh']]
         .map(([id, name, type]) => ({ href: `#${id}`, name, type }));

@@ -1,4 +1,4 @@
-// Efectos: partículas, glitch, líneas, interruptor «Efectos», prefers-reduced-motion y botón de tema.
+// Efectos: partículas, glitch, líneas, prefers-reduced-motion (apaga todo, incluido el cursor parpadeante) y botón de tema.
 import { VIEWPORTS, open } from './lib.mjs';
 
 export const name = 'movimiento, efectos y tema';
@@ -70,40 +70,21 @@ export async function run({ browser, base, report }) {
     await cc.context.close();
   }
 
-  // Interruptor «Efectos»: apaga partículas, brillo y glitch; se recuerda; sobrevive a un localStorage roto.
+  // Sin interruptor de efectos: no hay botón ni estado guardado; el apagado es solo por prefers-reduced-motion.
   {
     const { context, page } = await open(browser, base, '/index.html', { viewport: VIEWPORTS.d });
-    const estado = () => page.evaluate(() => {
-      const b = document.getElementById('fx-toggle');
-      return {
-        visible: !b.hidden && b.getBoundingClientRect().height >= 44, pressed: b.getAttribute('aria-pressed'), texto: b.textContent.trim(),
-        fx: getComputedStyle(document.querySelector('.fx')).display, glitch: getComputedStyle(document.querySelector('.nm'), '::before').display,
-        glow: getComputedStyle(document.querySelector('.name')).textShadow, guardado: localStorage.getItem('efectos'),
-      };
-    });
-    const on = await estado();
-    report.check('«Efectos» visible en la barra de estado, activado por defecto', on.visible && on.pressed === 'true' && on.texto === 'Efectos: sí' && on.fx === 'block' && on.glow !== 'none', JSON.stringify(on));
-    await page.click('#fx-toggle');
-    const off = await estado();
-    report.check('«Efectos» apagado: sin partículas, glitch ni brillo', off.pressed === 'false' && off.texto === 'Efectos: no' && off.fx === 'none' && off.glitch === 'none' && /rgba\(0, 0, 0, 0\)/.test(off.glow), JSON.stringify(off));
-    report.check('«Efectos» recuerda la preferencia (localStorage)', off.guardado === 'no');
-    await page.reload({ waitUntil: 'load' });
-    const rec = await estado();
-    report.check('«Efectos» sigue apagado tras recargar', rec.pressed === 'false' && rec.fx === 'none', JSON.stringify(rec));
-    await page.click('#fx-toggle');
-    report.check('«Efectos» se vuelve a activar', (await estado()).fx === 'block');
+    const r = await page.evaluate(() => ({ boton: Boolean(document.getElementById('fx-toggle')), texto: /Efectos|Effects/.test(document.querySelector('.status').innerText), attr: document.documentElement.hasAttribute('data-fx') }));
+    report.check('la barra de estado no tiene interruptor «Efectos»', !r.boton && !r.texto && !r.attr, JSON.stringify(r));
     await context.close();
-
+    // Con localStorage bloqueado el tema sigue funcionando y no hay errores.
     const roto = await open(browser, base, '/index.html', {
       viewport: VIEWPORTS.d,
       init: () => { Storage.prototype.getItem = () => { throw new Error('bloqueado'); }; Storage.prototype.setItem = () => { throw new Error('bloqueado'); }; },
     });
     const errores = [];
     roto.page.on('pageerror', (e) => errores.push(e.message));
-    await roto.page.click('#fx-toggle');
     await roto.page.click('[data-theme-toggle]');
-    report.check('con localStorage bloqueado el interruptor y el tema siguen funcionando sin errores',
-      errores.length === 0 && (await roto.page.evaluate(() => document.documentElement.dataset.fx === 'off' && document.documentElement.dataset.theme === 'claro')), errores.join('; '));
+    report.check('con localStorage bloqueado el tema sigue funcionando sin errores', errores.length === 0 && (await roto.page.evaluate(() => document.documentElement.dataset.theme === 'claro')), errores.join('; '));
     await roto.context.close();
   }
 

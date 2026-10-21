@@ -1,5 +1,5 @@
 /* Mejora progresiva del marco «Editor». Sin dependencias. Sin JavaScript todo el contenido se lee igual:
-   esto añade tema, interruptor de efectos, scrollspy, línea actual, minimapa, menú móvil, paleta de comandos,
+   esto añade tema, scrollspy, línea actual, minimapa, menú móvil, paleta de comandos,
    el filtro de la demo y la barra de estado con datos reales (errores contados, carga y LCP medidos, línea y
    columna según scroll y puntero). */
 (() => {
@@ -29,24 +29,6 @@
   });
   paintTheme();
   systemLight.addEventListener('change', paintTheme);
-
-  /* Efectos: partículas, brillo y glitch. Se recuerda; el movimiento reducido del sistema los apaga además. */
-  const fx = $('#fx-toggle');
-  if (fx) {
-    const paintFx = () => {
-      const on = root.dataset.fx !== 'off';
-      fx.setAttribute('aria-pressed', String(on));
-      put('fx-state', on ? fx.dataset.on : fx.dataset.off);
-    };
-    fx.hidden = false;
-    fx.addEventListener('click', () => {
-      const off = root.dataset.fx !== 'off';
-      if (off) root.dataset.fx = 'off'; else delete root.dataset.fx;
-      store('efectos', off ? 'no' : 'si');
-      paintFx();
-    });
-    paintFx();
-  }
 
   /* Explorador: en escritorio se pliega desde la barra de actividad; en móvil es un menú. */
   const shell = $('.shell');

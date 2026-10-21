@@ -2,7 +2,7 @@
 
 Portafolio estático de un desarrollador backend (Java, Spring Boot, Python, Odoo y nube). Tiene una portada con perfil, habilidades y experiencia, y un caso de estudio, **esg-trazabilidad**, con dos entradas: una demo instantánea con datos simulados dentro del propio sitio y un enlace al sistema real. Está en español y en inglés.
 
-El diseño imita un editor de código (explorador, pestañas, números de línea, minimapa y barra de estado). El contenido se lee entero sin JavaScript; el JavaScript solo añade mejoras (tema, interruptor de efectos, navegación, filtro de la demo y datos de la barra de estado). No usa dependencias en producción.
+El diseño imita un editor de código (explorador, pestañas, números de línea, minimapa y barra de estado). El contenido se lee entero sin JavaScript; el JavaScript solo añade mejoras (tema, navegación, filtro de la demo y datos de la barra de estado). No usa dependencias en producción.
 
 ## Verlo en local
 
@@ -25,6 +25,8 @@ Estructura:
 | `scripts/build.mjs` | genera las cinco páginas HTML desde el contenido |
 | `tests/` | pruebas automáticas |
 | `design/` | brief de diseño y maqueta de referencia (`design/DESIGN-BRIEF.md`) |
+
+El CV se enlaza solo si existe `assets/cv/CV_Angel_Saenz.pdf` al generar el sitio (con su tamaño en el texto); si no existe, las páginas muestran «[CV por confirmar]» sin enlace. Tras añadir el PDF, ejecuta `node scripts/build.mjs`.
 
 Las páginas HTML se generan: edita el contenido en `scripts/build.mjs` y ejecuta `node scripts/build.mjs`. Los estilos y el script están en `assets/css/site.css` y `assets/js/site.js`.
 
@@ -49,15 +51,16 @@ Qué comprueban:
 - **peso**: portada ≤ 150 KB, JS ≤ 15 KB, sin peticiones a otros orígenes, máximo cuatro fuentes;
 - **contraste**: AA en todo el texto, de ambos temas, contra el peor caso (resplandor entero y líneas de escaneo a su alfa máxima);
 - **maquetación**: sin desborde horizontal a 360 px, objetivos de 44 px, foco visible de 3 px, texto de 15 px o más y números de línea a toda la altura;
-- **movimiento**: `prefers-reduced-motion`, interruptor «Efectos» (se recuerda aun con el almacenamiento bloqueado), partículas, glitch único, líneas ≤ 8 %, solo `opacity` y `transform`, botón de tema;
+- **movimiento**: `prefers-reduced-motion` (apaga partículas, glitch, tecleo, entrada y cursor parpadeante), partículas, glitch único, líneas ≤ 8 %, solo `opacity` y `transform`, botón de tema;
 - **contenido**: legible sin JavaScript, enlaces externos con `rel="noopener noreferrer"`, aviso previo al sistema real, demo sin red, anclas válidas, reglas de estilo del brief;
+- **datos confirmados**: el CV nunca queda como enlace roto, ningún número parece un teléfono, el único correo es el confirmado y no se nombra a los clientes finales;
 - **CPU en reposo**: se mide y se informa (objetivo ≈ 2 % de un núcleo). Se mide en un navegador sin interfaz con rasterizado por software, así que no sustituye a una medición con GPU real.
 
 Para generar capturas locales (360, 1280 y 1920 px, tema oscuro y claro) en `design/refs/sitio/`: `node tests/capturas.mjs`.
 
 ## Efectos
 
-El interruptor **Efectos** de la barra de estado activa o apaga partículas, brillo y glitch del nombre, y recuerda la elección en el navegador. Con `prefers-reduced-motion` las animaciones se apagan por sí solas.
+No hay interruptor: las partículas, el glitch del nombre, el tecleo, la entrada escalonada y el cursor parpadeante se apagan solos con `prefers-reduced-motion`.
 
 ## Licencias
 

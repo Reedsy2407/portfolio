@@ -18,7 +18,7 @@ export const PAGES = [
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
-  '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
+  '.svg': 'image/svg+xml', '.pdf': 'application/pdf', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
 };
 
 /** Sirve la raíz del repositorio en un puerto libre. Las rutas que no existen responden con 404.html y estado 404. */
@@ -31,7 +31,9 @@ export function startServer() {
     const dentro = file.startsWith(ROOT + sep);
     try {
       if (!dentro || !(await stat(file)).isFile()) throw new Error('no');
-      res.writeHead(200, { 'content-type': MIME[extname(file)] ?? 'application/octet-stream' });
+      const tipo = { 'content-type': MIME[extname(file)] ?? 'application/octet-stream' };
+      if (req.method === 'HEAD') { res.writeHead(200, { ...tipo, 'content-length': (await stat(file)).size }); res.end(); return; }
+      res.writeHead(200, tipo);
       res.end(await readFile(file));
     } catch {
       res.writeHead(404, { 'content-type': MIME['.html'] });

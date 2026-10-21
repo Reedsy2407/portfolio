@@ -3,7 +3,7 @@ import { PAGES, VIEWPORTS, open } from './lib.mjs';
 
 export const name = 'maquetación y accesibilidad táctil';
 
-const OBJETIVOS = '.btn, .tag, .chip, .tabs a, .explorer a, .explorer summary, .lang a, .tool, .act:not(.off), .st-btn, .mark, dialog a';
+const OBJETIVOS = '.btn, .tag, .chip, .tabs a, .explorer a, .explorer summary, .lang a, .tool, .act:not(.off), .mark, dialog a';
 
 export async function run({ browser, base, report }) {
   for (const p of PAGES) {
