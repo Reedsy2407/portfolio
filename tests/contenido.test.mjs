@@ -6,6 +6,11 @@ import { PAGES, ROOT, VIEWPORTS, open } from './lib.mjs';
 
 export const name = 'contenido, enlaces y semántica';
 
+const DISPONIBLE = {
+  es: 'Disponible para proyectos freelance a tiempo parcial. Respondo por correo en 24 a 48 horas. Zona horaria: Lima (UTC−5).',
+  en: 'Available for part-time freelance projects. I reply by email within 24–48 hours. Time zone: Lima (UTC−5).',
+};
+const PERIODO_CASO = { es: 'Proyecto académico (EFSRT, CIBERTEC) · septiembre – octubre 2026', en: 'Academic project (EFSRT, CIBERTEC) · September – October 2026' };
 const AVISO = { es: 'puede tardar hasta 1 minuto en despertar (hosting gratuito)', en: 'may take up to 1 minute to wake up (free hosting)' };
 const ESPERADO = {
   es: {
@@ -27,7 +32,7 @@ export async function run({ browser, base, report }) {
     // Sin JavaScript: todo el texto del contenido está presente y a la vista.
     const { context, page } = await open(browser, base, p.path, { js: false, viewport: VIEWPORTS.d });
     const texto = await page.evaluate(() => document.querySelector('main').innerText.replace(/\s+/g, ' '));
-    const faltan = [...ESPERADO[p.lang][p.kind], AVISO[p.lang]].filter((x) => !texto.includes(x));
+    const faltan = [...ESPERADO[p.lang][p.kind], AVISO[p.lang], DISPONIBLE[p.lang], ...(p.kind === 'caso' ? [PERIODO_CASO[p.lang]] : [])].filter((x) => !texto.includes(x));
     report.check(`${p.path} sin JavaScript: el contenido se lee entero`, faltan.length === 0, faltan.join(' | '));
     const ocultos = await page.evaluate(() => [...document.querySelectorAll('main section')].filter((s) => s.getBoundingClientRect().height < 50 || getComputedStyle(s).visibility === 'hidden').map((s) => s.id));
     report.check(`${p.path} sin JavaScript: todas las secciones visibles`, ocultos.length === 0, ocultos.join(', '));
@@ -60,6 +65,14 @@ export async function run({ browser, base, report }) {
     report.check(`${p.path}: enlaces esperados presentes`, faltan.length === 0, faltan.join(', '));
     report.check(`${p.path}: los enlaces externos avisan de la pestaña nueva`, info.ext.every((a) => /pestaña nueva|new tab/.test(a.label)), '');
     report.check(`${p.path}: aviso de despertar visible y antes del botón del sistema real`, info.avisoAntes && info.avisoVisible && info.describe === 'aviso-sistema');
+    const pend = await page.evaluate(() => ({
+      fuera: [...document.querySelectorAll('.todo')].filter((e) => !e.closest('#resultados')).map((e) => e.textContent),
+      enResultados: document.querySelectorAll('#resultados .todo').length,
+      dispEnContacto: document.querySelector('#contacto').innerText.includes('UTC−5'),
+      rolCaso: [...document.querySelectorAll('.fm dt')].some((d) => /^(rol|role):/.test(d.textContent)) && Boolean(document.querySelector('#resumen')),
+    }));
+    report.check(`${p.path}: ningún marcador «por confirmar» visible salvo los de resultados`, pend.fuera.length === 0 && (p.kind === 'caso' ? pend.enResultados === 2 : true), JSON.stringify(pend));
+    report.check(`${p.path}: la disponibilidad está en el contacto y no hay línea de rol en el caso`, pend.dispEnContacto && !pend.rolCaso);
     report.check(`${p.path}: un único correo, con enlace mailto y visible`, info.mailtos.length > 0 && info.mailtos.every((m) => m === 'mailto:saenzvelarde2006@gmail.com') && info.correoVisible, info.mailtos.join(', '));
     report.check(`${p.path}: un h1, landmarks, sin roles inventados, decoración aria-hidden, sin emoji`, info.h1 === 1 && info.landmarks && info.roles === 0 && info.ariaHiddenDeco && !info.emoji, JSON.stringify({ h1: info.h1, lm: info.landmarks, roles: info.roles, deco: info.ariaHiddenDeco, emoji: info.emoji }));
 

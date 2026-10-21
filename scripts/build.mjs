@@ -12,6 +12,10 @@ const URL_SISTEMA = 'https://esg-frontend-egcf.onrender.com';
 const URL_DOCS = 'https://reedsy2407.github.io/esg-trazabilidad/';
 const URL_CODIGO = 'https://github.com/Reedsy2407/esg-trazabilidad';
 const NOMBRE = 'Angel Saenz';
+const DISPONIBILIDAD = {
+  es: 'Disponible para proyectos freelance a tiempo parcial. Respondo por correo en 24 a 48 horas. Zona horaria: Lima (UTC−5).',
+  en: 'Available for part-time freelance projects. I reply by email within 24–48 hours. Time zone: Lima (UTC−5).',
+};
 const CORREO = 'saenzvelarde2006@gmail.com';
 
 /* Rutas de cada página, relativas a la raíz del sitio. */
@@ -235,6 +239,7 @@ function contacto(lang, root) {
   return section('contacto', 'contacto.sh', 'sh', 'Shell', 'shell', 'f-con', `  <h2 class="title-px" id="f-con">${t(lang, '¿Hablamos?', 'Shall we talk?')}</h2>
   <p class="mono"><span class="cm">#!/bin/sh</span></p>
   <p class="lead">${CONTACTO_LEAD[lang]}</p>
+  <p>${DISPONIBILIDAD[lang]}</p>
   <p class="mono"><span class="cmd">echo</span> <span class="st">"${t(lang, 'correo', 'email')}: </span><a href="mailto:${CORREO}">${CORREO}</a><span class="st">"</span></p>
   <p class="mono"><span class="cmd">echo</span> <span class="st">"cv: </span>${CV_BYTES === null ? cvTodo(lang) : `<a href="${root}${CV_RUTA}" target="_blank" rel="noopener noreferrer" aria-label="CV_Angel_Saenz.pdf (PDF, ${cvTamano()}) ${UI[lang].newTab}">CV_Angel_Saenz.pdf (PDF, ${cvTamano()})</a>`}<span class="st">"</span></p>
   ${nombreLi(URL_LINKEDIN, 'linkedin.com/in/saenzdev', `LinkedIn ${t(lang, 'de', 'of')} ${NOMBRE}`)}
@@ -331,7 +336,7 @@ function homeSections(lang, hrefs, root) {
       <dt>${t(lang, 'nombre', 'name')}:</dt><dd>${NOMBRE}</dd>
       <dt>${t(lang, 'rol', 'role')}:</dt><dd>backend developer</dd>
       <dt>${t(lang, 'ciudad', 'city')}:</dt><dd>Lima, ${t(lang, 'Perú', 'Peru')}</dd>
-      <dt>${t(lang, 'disponible', 'available')}:</dt><dd>${todo(lang)}</dd>
+      <dt>${t(lang, 'disponible', 'available')}:</dt><dd>${DISPONIBILIDAD[lang]}</dd>
     </dl>
     <p aria-hidden="true">---</p>
   </div>`);
@@ -438,10 +443,8 @@ function casoSections(lang, hrefs, root) {
   <div class="fm rise" style="--i:4">
     <p aria-hidden="true">---</p>
     <dl>
-      <dt>${t(lang, 'tipo', 'type')}:</dt><dd>${t(lang, 'proyecto académico', 'academic project')}</dd>
       <dt>stack:</dt><dd>Java 21, Spring Boot 3.3.5, Angular</dd>
-      <dt>${t(lang, 'rol', 'role')}:</dt><dd>${todo(lang)}</dd>
-      <dt>${t(lang, 'periodo', 'period')}:</dt><dd>${todo(lang)}</dd>
+      <dt>${t(lang, 'contexto', 'context')}:</dt><dd>${t(lang, 'Proyecto académico (EFSRT, CIBERTEC) · septiembre – octubre 2026', 'Academic project (EFSRT, CIBERTEC) · September – October 2026')}</dd>
     </dl>
     <p aria-hidden="true">---</p>
   </div>`);
