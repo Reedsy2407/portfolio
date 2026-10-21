@@ -10,11 +10,11 @@ const DISPONIBLE = {
   es: 'Disponible para proyectos freelance a tiempo parcial. Respondo por correo en 24 a 48 horas. Zona horaria: Lima (UTC−5).',
   en: 'Available for part-time freelance projects. I reply by email within 24–48 hours. Time zone: Lima (UTC−5).',
 };
-const PERIODO_PROYECTO = { es: 'Proyecto académico (EFSRT, CIBERTEC) · septiembre – octubre 2026', en: 'Academic project (EFSRT, CIBERTEC) · September – October 2026' };
+const PERIODO_PROYECTO = { es: 'Proyecto propio (EFSRT, CIBERTEC) · septiembre – octubre 2026', en: 'Personal project (EFSRT, CIBERTEC) · September – October 2026' };
 const AVISO = { es: 'puede tardar hasta 1 minuto en despertar (hosting gratuito)', en: 'may take up to 1 minute to wake up (free hosting)' };
 const ESPERADO = {
-  es: ['Angel Saenz', '// Backend Developer', 'Java 21', 'Spring Boot', 'Kubernetes', 'Azure DevOps', 'HRF GROUP S.A.C.', 'Hera Consulting SAC', 'COMPIPRO', 'plataforma de e-commerce B2B', 'sector educación', 'CRM empresarial', 'Cibertec', 'EF SET 64/100', 'Scrum Fundamentals Certified', 'saenzvelarde2006@gmail.com', 'Portal Laboral', 'Helpcore', 'cuenta demo de un clic', 'recicladores formalizados de Lima Metropolitana', 'certificado digital en PDF', 'Spring Boot 3.3.5', 'Outbox/Inbox', 'Liquibase'],
-  en: ['Angel Saenz', '// Backend Developer', 'Java 21', 'Kubernetes', 'HRF GROUP S.A.C.', 'Hera Consulting SAC', 'COMPIPRO', 'B2B e-commerce platform', 'education sector', 'enterprise CRM', 'Cibertec', 'EF SET 64/100', 'Scrum Fundamentals Certified', 'saenzvelarde2006@gmail.com', 'Portal Laboral', 'Spring Security with JWT', 'Helpcore', 'formalized recyclers in Metropolitan Lima', 'digital PDF certificate', 'Outbox/Inbox'],
+  es: ['Angel Saenz', '// Backend Developer', 'Java 21', 'Spring Boot', 'Kubernetes', 'Azure DevOps', 'HRF GROUP S.A.C.', 'Hera Consulting SAC', 'COMPIPRO', 'plataforma de e-commerce B2B', 'sector educación', 'CRM empresarial', 'Cibertec', 'EF SET 64/100', 'Scrum Fundamentals Certified', 'saenzvelarde2006@gmail.com', 'cuenta demo de un clic', 'recicladores formalizados de Lima Metropolitana', 'certificado digital en PDF', 'Spring Boot 3.3.5', 'Outbox/Inbox', 'Liquibase'],
+  en: ['Angel Saenz', '// Backend Developer', 'Java 21', 'Kubernetes', 'HRF GROUP S.A.C.', 'Hera Consulting SAC', 'COMPIPRO', 'B2B e-commerce platform', 'education sector', 'enterprise CRM', 'Cibertec', 'EF SET 64/100', 'Scrum Fundamentals Certified', 'saenzvelarde2006@gmail.com', 'formalized recyclers in Metropolitan Lima', 'digital PDF certificate', 'Outbox/Inbox'],
 };
 const EXTERNOS = [
   'https://www.linkedin.com/in/saenzdev/', 'https://github.com/Reedsy2407', 'https://esg-frontend-egcf.onrender.com',
@@ -33,6 +33,8 @@ export async function run({ browser, base, report }) {
     const ocultos = await page.evaluate(() => [...document.querySelectorAll('main section')].filter((s) => s.getBoundingClientRect().height < 50 || getComputedStyle(s).visibility === 'hidden').map((s) => s.id));
     const marcasEs = p.lang === 'en' ? (texto.match(/(con|para|más|las|los|una|del|sin|de la)/g) || []) : [];
     report.check(`${p.path}: la traducción no deja palabras en español`, marcasEs.length === 0, marcasEs.join(', '));
+    const mailtosSinJs = await page.evaluate(() => [...document.querySelectorAll('a[href^="mailto:"]')].map((a) => a.getAttribute('href')));
+    report.check(`${p.path} sin JavaScript: un único correo, con enlace mailto`, mailtosSinJs.length === 1 && mailtosSinJs[0] === 'mailto:saenzvelarde2006@gmail.com', mailtosSinJs.join(', '));
     report.check(`${p.path} sin JavaScript: todas las secciones visibles`, ocultos.length === 0, ocultos.join(', '));
     await context.close();
   }
@@ -53,7 +55,6 @@ export async function run({ browser, base, report }) {
         ariaHiddenDeco: ['.fx', '.gutter', '.minimap', '.curline', '.lights'].every((s) => [...document.querySelectorAll(s)].every((e) => e.closest('[aria-hidden="true"]'))),
         emoji: /\p{Extended_Pictographic}/u.test(document.body.innerText),
         pendientes: [...document.querySelectorAll('.todo')].map((e) => e.textContent),
-        mailtos: [...document.querySelectorAll('a[href^="mailto:"]')].map((a) => a.getAttribute('href')),
       };
     });
     const mal = info.ext.filter((a) => a.target !== '_blank' || !/noopener/.test(a.rel) || !/noreferrer/.test(a.rel));
@@ -62,7 +63,6 @@ export async function run({ browser, base, report }) {
     report.check(`${p.path}: enlaces esperados presentes`, faltan.length === 0, faltan.join(', '));
     report.check(`${p.path}: los enlaces externos avisan de la pestaña nueva`, info.ext.every((a) => /pestaña nueva|new tab/.test(a.label)), '');
     report.check(`${p.path}: aviso de despertar visible y antes del botón del sistema real`, info.avisoAntes && info.avisoVisible && info.describe === 'aviso-sistema');
-    report.check(`${p.path}: un único correo, con enlace mailto`, info.mailtos.length > 0 && info.mailtos.every((m) => m === 'mailto:saenzvelarde2006@gmail.com'), info.mailtos.join(', '));
     report.check(`${p.path}: un h1, landmarks, sin roles inventados, decoración aria-hidden, sin emoji`, info.h1 === 1 && info.landmarks && info.roles === 0 && info.ariaHiddenDeco && !info.emoji, JSON.stringify({ h1: info.h1, lm: info.landmarks, roles: info.roles, deco: info.ariaHiddenDeco, emoji: info.emoji }));
     report.check(`${p.path}: ningún marcador «por confirmar» visible`, info.pendientes.length === 0, info.pendientes.join(', '));
     await context.close();

@@ -304,7 +304,6 @@ function homeSections(lang, root) {
     ${ext(URL_LINKEDIN, chipLabel('LinkedIn'), `${ic('i-linkedin', 18)}LinkedIn`, lang, 'tag')}
     ${ext(URL_GITHUB, chipLabel('GitHub'), `${ic('i-github', 18)}GitHub`, lang, 'tag')}
     <a class="tag" id="copiar-correo" href="mailto:${CORREO}" data-label="${copiarLabel}" data-ok="${t(lang, 'Copiado', 'Copied')}" data-fail="${t(lang, 'No se pudo copiar', 'Could not copy')}">${ic('i-mail', 18)}<span>${CORREO}</span></a>
-    <a class="tag js-only" href="mailto:${CORREO}">${t(lang, 'Escribir', 'Write')}</a>
     <span class="copiado" id="copiado" aria-live="polite"></span>
   </div>
   ${CV_BYTES === null ? `<p class="note">CV: ${cvTodo(lang)}</p>` : ''}
@@ -358,10 +357,10 @@ function homeSections(lang, root) {
     ${EXPERIENCIA.map(job).join('\n    ')}
   </ol>`);
 
-  const proyectos = section('proyectos', t(lang, 'proyectos.md', 'projects.md'), 'md', 'Markdown', t(lang, 'proyecto destacado y propios', 'featured and personal projects'), 'f-pro', `  <h2 class="title-px" id="f-pro">${t(lang, 'Proyectos', 'Projects')}</h2>
+  const proyectos = section('proyectos', t(lang, 'proyectos.md', 'projects.md'), 'md', 'Markdown', t(lang, 'proyecto destacado', 'featured project'), 'f-pro', `  <h2 class="title-px" id="f-pro">${t(lang, 'Proyectos', 'Projects')}</h2>
   <article class="project wide" aria-labelledby="p-esg">
     <h3 id="p-esg">esg-trazabilidad</h3>
-    <p class="project-meta">${t(lang, 'Proyecto académico (EFSRT, CIBERTEC) · septiembre – octubre 2026', 'Academic project (EFSRT, CIBERTEC) · September – October 2026')}</p>
+    <p class="project-meta">${t(lang, 'Proyecto propio (EFSRT, CIBERTEC) · septiembre – octubre 2026', 'Personal project (EFSRT, CIBERTEC) · September – October 2026')}</p>
     <p>${PROJECT_TEXT[lang]}</p>
     ${tagList(['Java 21', 'Spring Boot 3.3.5', 'Angular', 'PostgreSQL', 'Liquibase', 'Render', 'Neon', 'CloudAMQP'], t(lang, 'Tecnologías', 'Technologies'))}
     <p class="notice" id="aviso-sistema"><b>${t(lang, 'Aviso:', 'Notice:')}</b> ${t(lang,
@@ -372,12 +371,7 @@ function homeSections(lang, root) {
       ${ext(URL_CODIGO, `${t(lang, 'Código', 'Code')} ${t(lang, 'de', 'of')} esg-trazabilidad`, `${ic('i-github', 18)}${t(lang, 'Código', 'Code')}`, lang, 'btn')}
       ${ext(URL_DOCS, `${t(lang, 'Documentación', 'Documentation')} ${t(lang, 'de', 'of')} esg-trazabilidad`, `${ic('i-file', 18)}${t(lang, 'Documentación', 'Documentation')}`, lang, 'btn')}
     </div>
-  </article>
-  <h3 class="sub">${t(lang, 'Proyectos propios', 'Personal projects')}</h3>
-  <ul class="plain dec own">
-    <li><strong>Portal Laboral</strong>${t(lang, 'Spring Boot, Spring Security con JWT, Angular y MySQL.', 'Spring Boot, Spring Security with JWT, Angular and MySQL.')}</li>
-    <li><strong>Helpcore</strong>${t(lang, 'Microservicios con API Gateway, autenticación, config server y notificaciones con Redis.', 'Microservices with API Gateway, authentication, config server and Redis notifications.')}</li>
-  </ul>`);
+  </article>`);
 
   return [perfil, sobre, hab, exp, proyectos];
 }

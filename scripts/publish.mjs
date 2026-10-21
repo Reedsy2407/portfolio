@@ -21,8 +21,9 @@ if (build.status !== 0) {
 
 // 2. Limpiar y recrear dist/ y copiar la lista permitida.
 if (relative(ROOT, DIST) !== 'dist') throw new Error('Ruta de dist/ inesperada');
-rmSync(DIST, { recursive: true, force: true });
-mkdirSync(DIST);
+/* Se vacía el contenido en vez de borrar la carpeta: en Windows un proceso que la tenga abierta impide borrarla. */
+mkdirSync(DIST, { recursive: true });
+for (const e of readdirSync(DIST)) rmSync(join(DIST, e), { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
 for (const nombre of PERMITIDOS) {
   const origen = join(ROOT, nombre);
   if (!existsSync(origen)) throw new Error(`Falta «${nombre}» en el repositorio`);

@@ -1028,22 +1028,6 @@ a.tag:hover {
 
 /* JSON con guías de sangría */
 
-.plain {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.dec li {
-  padding: var(--space-4) 0;
-  border-bottom: var(--hair) solid var(--line);
-}
-.dec strong {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: var(--t-0);
-  font-weight: 700;
-  color: var(--ink-strong);
-}
 
 
 /* ── Barra de estado (datos reales) ──────────────── */
@@ -1512,13 +1496,6 @@ button.tag:hover {
   gap: var(--space-2);
 }
 
-/* Solo con JavaScript (el botón de «Escribir» junto al chip de copiar). */
-.links a.js-only {
-  display: none;
-}
-.js .links a.js-only {
-  display: inline-flex;
-}
 .copiado {
   display: inline-block;
   min-width: 14ch;
@@ -1673,13 +1650,6 @@ button.tag:hover {
 }
 .project .cta {
   margin-block: var(--space-4) 0;
-}
-.sub {
-  margin: var(--space-10) 0 var(--space-2);
-  font-family: var(--font-mono);
-  font-size: var(--t-0);
-  font-weight: 700;
-  color: var(--ink-strong);
 }
 
 @media (min-width: 600px) {

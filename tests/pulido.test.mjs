@@ -15,8 +15,8 @@ export async function run({ browser, base, report }) {
       const ctx = await browser.newContext({ viewport: VIEWPORTS.d, permissions: ['clipboard-read', 'clipboard-write'] });
       const page = await ctx.newPage();
       await page.goto(base + p.path, { waitUntil: 'load' });
-      const antes = await page.evaluate(() => ({ chip: document.getElementById('copiar-correo').tagName, escribir: [...document.querySelectorAll('a.js-only')].map((a) => ({ href: a.getAttribute('href'), v: a.getBoundingClientRect().height >= 44 })) }));
-      report.check(`${p.path}: con JS el chip es un botón y «Escribir» (mailto) aparece junto a él`, antes.chip === 'BUTTON' && antes.escribir.length === 1 && antes.escribir[0].href === `mailto:${CORREO}` && antes.escribir[0].v, JSON.stringify(antes));
+      const antes = await page.evaluate(() => ({ chip: document.getElementById('copiar-correo').tagName, escribir: [...document.querySelectorAll('a')].filter((a) => /^(Escribir|Write)$/.test(a.textContent.trim()) || a.classList.contains('js-only')).length, mailtos: document.querySelectorAll('a[href^="mailto:"]').length }));
+      report.check(`${p.path}: con JS el chip es un botón que copia y no hay enlace «${en ? 'Write' : 'Escribir'}» (ni otro mailto)`, antes.chip === 'BUTTON' && antes.escribir === 0 && antes.mailtos === 0, JSON.stringify(antes));
       const nombre = await page.getAttribute('#copiar-correo', 'aria-label');
       report.check(`${p.path}: nombre accesible «${en ? 'Copy email' : 'Copiar correo'} ${CORREO}»`, nombre === `${en ? 'Copy email' : 'Copiar correo'} ${CORREO}`, nombre);
       const vivo = await page.getAttribute('#copiado', 'aria-live');
@@ -53,11 +53,10 @@ export async function run({ browser, base, report }) {
       const { context, page } = await open(browser, base, p.path, { js: false, viewport: VIEWPORTS.d });
       const r = await page.evaluate(() => {
         const c = document.getElementById('copiar-correo');
-        const e = [...document.querySelectorAll('a.js-only')][0];
         const box = c.getBoundingClientRect();
-        return { tag: c.tagName, href: c.getAttribute('href'), visible: box.width > 0 && box.height >= 44, escribirVisible: e.getBoundingClientRect().width > 0 };
+        return { tag: c.tagName, href: c.getAttribute('href'), visible: box.width > 0 && box.height >= 44, escribir: [...document.querySelectorAll('a')].filter((a) => /^(Escribir|Write)$/.test(a.textContent.trim())).length };
       });
-      report.check(`${p.path} sin JS: el chip es un enlace mailto visible y «Escribir» no se muestra`, r.tag === 'A' && r.href === `mailto:${CORREO}` && r.visible && !r.escribirVisible, JSON.stringify(r));
+      report.check(`${p.path} sin JS: el chip es un enlace mailto visible (y no hay «Escribir»)`, r.tag === 'A' && r.href === `mailto:${CORREO}` && r.visible && r.escribir === 0, JSON.stringify(r));
       await context.close();
     }
 
@@ -108,18 +107,20 @@ export async function run({ browser, base, report }) {
       await context.close();
     }
 
-    // ── Proyecto destacado: enlaces y propios.
+    // ── Proyecto destacado: enlaces; es el único proyecto.
     {
       const { context, page } = await open(browser, base, p.path, { viewport: VIEWPORTS.d });
       const r = await page.evaluate(() => {
         const card = document.querySelector('.project');
         const acciones = [...card.querySelectorAll('a')].map((a) => ({ href: a.href, rel: a.rel, target: a.target, label: a.getAttribute('aria-label'), texto: a.innerText.trim(), h: a.getBoundingClientRect().height }));
-        return { acciones, tags: [...card.querySelectorAll('.chips-tech li')].map((x) => x.textContent), propios: [...document.querySelectorAll('.own li strong')].map((x) => x.textContent), h3: card.querySelector('h3').textContent };
+        return { acciones, tags: [...card.querySelectorAll('.chips-tech li')].map((x) => x.textContent), h3: card.querySelector('h3').textContent, tarjetas: document.querySelectorAll('.project').length, h3s: [...document.querySelectorAll('#proyectos h3')].map((x) => x.textContent), meta: card.querySelector('.project-meta').textContent, cuerpo: document.getElementById('proyectos').innerText, archivo: document.querySelector('#proyectos .file-name').innerText };
       });
       const urls = r.acciones.map((a) => a.href);
       const esperadas = ['https://esg-frontend-egcf.onrender.com/', 'https://github.com/Reedsy2407/esg-trazabilidad', 'https://reedsy2407.github.io/esg-trazabilidad/'];
       report.check(`${p.path}: la tarjeta tiene Sistema real, Código y Documentación con rel y pestaña nueva`, esperadas.every((u) => urls.includes(u)) && r.acciones.every((a) => /noopener/.test(a.rel) && /noreferrer/.test(a.rel) && a.target === '_blank' && /(pestaña nueva|new tab)/.test(a.label) && a.label.startsWith(a.texto) && a.h >= 44), JSON.stringify(r.acciones.map((a) => [a.texto, a.rel, a.h])));
-      report.check(`${p.path}: etiquetas de tecnologías y proyectos propios`, ['Java 21', 'Spring Boot 3.3.5', 'Angular', 'PostgreSQL'].every((t) => r.tags.includes(t)) && r.propios.join() === 'Portal Laboral,Helpcore' && r.h3 === 'esg-trazabilidad', JSON.stringify({ tags: r.tags, propios: r.propios }));
+      const metaEsperada = en ? 'Personal project (EFSRT, CIBERTEC) · September – October 2026' : 'Proyecto propio (EFSRT, CIBERTEC) · septiembre – octubre 2026';
+      report.check(`${p.path}: etiquetas de tecnologías, contexto «${metaEsperada}» y subtítulo del archivo`, ['Java 21', 'Spring Boot 3.3.5', 'Angular', 'PostgreSQL'].every((t) => r.tags.includes(t)) && r.h3 === 'esg-trazabilidad' && r.meta === metaEsperada && r.archivo.endsWith(en ? 'featured project' : 'proyecto destacado'), JSON.stringify({ tags: r.tags, meta: r.meta, archivo: r.archivo }));
+      report.check(`${p.path}: solo esg-trazabilidad en proyectos (sin Portal Laboral, Helpcore ni «otros proyectos»)`, r.tarjetas === 1 && r.h3s.join() === 'esg-trazabilidad' && !/Portal Laboral|Helpcore|otros proyectos|proyectos propios|other projects|personal projects/i.test(r.cuerpo), JSON.stringify({ t: r.tarjetas, h3s: r.h3s }));
       await context.close();
     }
 

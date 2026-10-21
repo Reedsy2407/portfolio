@@ -1,6 +1,6 @@
 # Portafolio — Angel Saenz
 
-Portafolio estático de un desarrollador backend (Java, Spring Boot, Python, Odoo y nube). Es una sola página con perfil, habilidades, experiencia en línea de tiempo y proyectos: el destacado, **esg-trazabilidad** (con enlaces al sistema real, al código y a la documentación), y dos proyectos propios. Está en español y en inglés.
+Portafolio estático de un desarrollador backend (Java, Spring Boot, Python, Odoo y nube). Es una sola página con perfil, habilidades, experiencia en línea de tiempo y proyectos: el destacado, **esg-trazabilidad** (con enlaces al sistema real, al código y a la documentación) como único proyecto. Está en español y en inglés.
 
 El diseño imita un editor de código (explorador, pestañas, números de línea, minimapa y barra de estado). El contenido se lee entero sin JavaScript; el JavaScript solo añade mejoras (tema, navegación, copiar el correo y datos de la barra de estado). No usa dependencias en producción.
 
@@ -70,7 +70,7 @@ Qué comprueban:
 - **maquetación**: sin desborde horizontal a 360 px, objetivos de 44 px, foco visible de 3 px, texto de 15 px o más y números de línea a toda la altura;
 - **movimiento**: `prefers-reduced-motion` (apaga partículas, glitch, tecleo, entrada y cursor parpadeante), partículas, glitch único, líneas ≤ 8 %, solo `opacity` y `transform`, botón de tema;
 - **contenido**: legible sin JavaScript, enlaces externos con `rel="noopener noreferrer"`, aviso previo al sistema real, anclas válidas, reglas de estilo del brief;
-- **pulido**: copiar el correo (con y sin JavaScript), iconos `aria-hidden`, secciones quitadas, disponibilidad única, enlaces de proyecto y legibilidad de la línea de tiempo (interlineado, ancho de línea, aire entre puestos);
+- **pulido**: copiar el correo (con y sin JavaScript, sin enlace «Escribir»), iconos `aria-hidden`, secciones quitadas, disponibilidad única, enlaces de proyecto y legibilidad de la línea de tiempo (interlineado, ancho de línea, aire entre puestos);
 - **publicación**: `dist/` con exactamente la lista permitida, enlaces internos y recursos sin romper, el CV, ausencia de teléfono y de clientes finales, cabeceras presentes y la CSP aplicada de verdad (cero violaciones y cero errores de consola al usar tema, paleta, scroll y copiar el correo), y el 404 bajo una ruta profunda;
 - **datos confirmados**: el CV nunca queda como enlace roto, ningún número parece un teléfono, el único correo es el confirmado y no se nombra a los clientes finales;
 - **CPU en reposo**: se mide y se informa (objetivo ≈ 2 % de un núcleo). Se mide en un navegador sin interfaz con rasterizado por software, así que no sustituye a una medición con GPU real.
