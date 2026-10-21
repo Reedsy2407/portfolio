@@ -1,4 +1,4 @@
-# Cabeceras de publicación (formato de Cloudflare Pages). scripts/publish.mjs sustituye el marcador de la CSP por el hash
+# Cabeceras de publicación (formato _headers de los activos estáticos de Cloudflare Workers). scripts/publish.mjs sustituye el marcador de la CSP por el hash
 # SHA-256 del script en línea de cada página y escribe el resultado como dist/_headers.
 #
 # CSP: todo del mismo origen. El único script en línea (el del tema, en <head>) se autoriza por hash, sin 'unsafe-inline'.
@@ -7,7 +7,9 @@
 # porque las texturas de líneas de escaneo son SVG en data URI dentro del CSS. Los enlaces externos son solo navegación.
 #
 # Caché: los archivos de assets/ no llevan hash en el nombre, así que no se marcan como inmutables: caché corta con
-# revalidación. El HTML usa la caché por defecto de la plataforma (revalidar siempre).
+# revalidación. El HTML usa la caché por defecto de la plataforma (revalidar siempre). Un solo * por ruta, sin duplicar
+# cabeceras entre reglas y líneas de menos de 2 000 caracteres (límites de la plataforma). Las líneas con # se quitan al
+# generar dist/_headers.
 
 /*
   X-Content-Type-Options: nosniff

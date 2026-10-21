@@ -8,9 +8,12 @@
     "build": "node scripts/build.mjs",
     "publish": "node scripts/publish.mjs",
     "test": "node tests/run.mjs",
-    "capturas": "node tests/capturas.mjs"
+    "capturas": "node tests/capturas.mjs",
+    "deploy": "npm run publish && wrangler deploy",
+    "preview": "wrangler dev"
   },
   "devDependencies": {
-    "playwright-core": "1.63.0"
+    "playwright-core": "1.63.0",
+    "wrangler": "^4.151.3"
   }
 }

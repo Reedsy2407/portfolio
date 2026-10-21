@@ -45,7 +45,17 @@ npm run publish
 | `assets/` | CSS, JS, fuentes con sus licencias, favicon y el CV |
 | `_headers` | cabeceras de seguridad (nosniff, Referrer-Policy, X-Frame-Options, Permissions-Policy y una CSP estricta del mismo origen, con el script en línea autorizado por su hash) y caché corta con revalidación para `assets/`; se genera desde `scripts/_headers.template` |
 
-Nada más entra en `dist/` (ni `design/`, `tests/`, `scripts/`, `package*.json`, notas ni capturas). Como los archivos de `assets/` no llevan hash en el nombre, no se marcan como inmutables. El formato de `_headers` es el de Cloudflare Pages; el CV, si cambia, se sustituye en `assets/cv/` antes de publicar.
+Nada más entra en `dist/` (ni `design/`, `tests/`, `scripts/`, `package*.json`, notas ni capturas). Como los archivos de `assets/` no llevan hash en el nombre, no se marcan como inmutables. El formato de `_headers` es el de los activos estáticos de Cloudflare Workers (un solo `*` por ruta, sin cabeceras duplicadas entre reglas; no se garantiza que se apliquen a la respuesta de la página 404, así que se comprueba tras desplegar); el CV, si cambia, se sustituye en `assets/cv/` antes de publicar.
+
+## Desplegar
+
+`wrangler.jsonc` publica `dist/` como activos estáticos de un Worker (sin código: solo archivos, con la página 404 propia). Con la cuenta ya vinculada (`wrangler login`):
+
+```
+npm run deploy
+```
+
+Ejecuta primero `npm run publish` y luego `wrangler deploy`. La primera vez, wrangler pide el nombre del subdominio de `workers.dev`. `.gitattributes` fija los finales de línea en LF y trata los PDF y las fuentes como binarios.
 
 ## Pruebas
 

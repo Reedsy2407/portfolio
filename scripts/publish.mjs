@@ -52,7 +52,9 @@ for (const p of paginas) {
 }
 if (!hashes.size) throw new Error('No se encontró el script en línea del <head>');
 const plantilla = readFileSync(join(ROOT, 'scripts', '_headers.template'), 'utf8');
-writeFileSync(join(DIST, '_headers'), plantilla.replaceAll('{{SCRIPT_HASHES}}', [...hashes].join(' ')));
+/* Sin líneas de comentario en dist/_headers: así no se depende de cómo cada plataforma interprete «#». */
+const cabeceras = plantilla.replaceAll('{{SCRIPT_HASHES}}', [...hashes].join(' ')).split('\n').filter((l) => !l.startsWith('#')).join('\n').replace(/^\n+/, '');
+writeFileSync(join(DIST, '_headers'), cabeceras);
 
 // 5. Resumen: contenido exacto y tamaño total.
 let total = 0;
