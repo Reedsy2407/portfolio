@@ -1,5 +1,7 @@
 # Portafolio — Angel Saenz
 
+Sitio en vivo: https://portafolio.saenzdev.workers.dev
+
 Portafolio estático de un desarrollador backend (Java, Spring Boot, Python, Odoo y nube). Es una sola página con perfil, habilidades, experiencia en línea de tiempo y proyectos: el destacado, **esg-trazabilidad** (con enlaces al sistema real, al código y a la documentación) como único proyecto. Está en español y en inglés.
 
 El diseño imita un editor de código (explorador, pestañas, números de línea, minimapa y barra de estado). El contenido se lee entero sin JavaScript; el JavaScript solo añade mejoras (tema, navegación, copiar el correo y datos de la barra de estado). No usa dependencias en producción.
