@@ -6,10 +6,11 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "publish": "node scripts/publish.mjs",
+    "publicar": "node scripts/publish.mjs",
     "test": "node tests/run.mjs",
+    "front": "node tests/front/run.mjs --solo dist,datos,contenido,layout,movimiento,peso,csp,cpu",
     "capturas": "node tests/capturas.mjs",
-    "deploy": "npm run publish && wrangler deploy",
+    "deploy": "npm run publicar && wrangler deploy",
     "preview": "wrangler dev"
   },
   "devDependencies": {

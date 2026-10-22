@@ -9,8 +9,6 @@ import { ROOT, VIEWPORTS, parseHeaders, startServer } from './lib.mjs';
 export const name = 'publicación: dist/ y cabeceras';
 
 const DIST = join(ROOT, 'dist');
-const TELEFONO = /(?:\+?\d[\s().-]?){7,}/;
-const PROHIBIDOS = ['design', 'kit', 'tests', '.claude', 'CLAUDE.md', 'HANDOFF.md', 'package.json', 'package-lock.json', 'node_modules', 'scripts', 'tasks', '.git', 'README.md'];
 
 const archivos = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? archivos(join(dir, e.name)) : [join(dir, e.name)]));
 const rel = (p) => relative(DIST, p).replaceAll('\\', '/');
@@ -22,14 +20,7 @@ export async function run({ browser, base: _base, report }) {
 
   // ── Contenido exacto de dist/.
   const todos = archivos(DIST).map(rel).sort();
-  const permitido = (f) => f === 'index.html' || f === '404.html' || f === '_headers' || f === 'en/index.html' || f.startsWith('assets/');
-  const fuera = todos.filter((f) => !permitido(f));
-  const topes = [...new Set(todos.map((f) => f.split('/')[0]))].sort();
-  report.check('dist/ contiene solo la lista permitida (index.html, 404.html, en/, assets/ y _headers)', fuera.length === 0 && topes.join() === '404.html,_headers,assets,en,index.html', `${topes.join(', ')}${fuera.length ? ' · fuera: ' + fuera.join(', ') : ''}`);
-  const colados = todos.filter((f) => PROHIBIDOS.some((x) => f === x || f.startsWith(x + '/')) || /\.(png|jpe?g|gif|webp)$/i.test(f) || /(^|\/)\.[^/]/.test(f));
-  report.check('dist/ no contiene design/, kit/, tests/, .claude/, CLAUDE.md, HANDOFF.md, package*.json, node_modules, scripts/ ni capturas', colados.length === 0, colados.join(', '));
-  const faltan = ['index.html', '404.html', '_headers', 'en/index.html', 'assets/css/site.css', 'assets/js/site.js', 'assets/favicon.svg'].filter((f) => !todos.includes(f));
-  report.check('dist/ trae lo imprescindible', faltan.length === 0, faltan.join(', '));
+  // (La lista permitida, lo que no debe publicarse y los archivos imprescindibles: tests/front, prueba «dist».)
   const total = archivos(DIST).reduce((n, p) => n + statSync(p).size, 0);
   report.info('dist/', `${todos.length} archivos, ${(total / 1024).toFixed(1)} KB`);
 
@@ -98,21 +89,7 @@ export async function run({ browser, base: _base, report }) {
     const ra = await fetch(srv.base + '/assets/css/site.css');
     report.check('el servidor entrega las cabeceras de seguridad en el HTML y la caché corta en assets', r.headers.get('x-content-type-options') === 'nosniff' && r.headers.get('x-frame-options') === 'DENY' && Boolean(r.headers.get('content-security-policy')) && /max-age=3600/.test(ra.headers.get('cache-control') || '') && !/immutable/.test(ra.headers.get('cache-control') || ''));
 
-    // Teléfono y clientes ausentes en el HTML de dist/ (texto visible y enlaces).
-    const html = todos.filter((f) => f.endsWith('.html')).map((f) => readFileSync(join(DIST, f), 'utf8')).join('\n');
-    const ctx1 = await browser.newContext({ viewport: VIEWPORTS.d });
-    const tel = [];
-    for (const ruta of rutasHtml) {
-      const page = await ctx1.newPage();
-      await page.goto(srv.base + ruta);
-      const visible = await page.evaluate(() => ['main', '.titlebar', '.status'].map((s) => document.querySelector(s).innerText).join('\n'));
-      const m = visible.match(TELEFONO);
-      if (m) tel.push(`${ruta}: ${m[0]}`);
-      await page.close();
-    }
-    await ctx1.close();
-    report.check('ningún HTML de dist/ muestra o enlaza un teléfono', tel.length === 0 && !/href="(tel:|sms:|https?:\/\/(wa\.me|api\.whatsapp|wa\.link))/i.test(html), tel.join('; '));
-    report.check('ningún HTML de dist/ nombra a los clientes finales', !/cliente-1|cliente-3|cliente-4|\bcliente-2\b/i.test(html));
+    // (Teléfonos y clientes finales ausentes de dist/: tests/front, prueba «datos».)
 
     // CSP aplicada: cero violaciones y cero errores de consola, incluido copiar el correo.
     const problemas = [];
@@ -147,23 +124,7 @@ export async function run({ browser, base: _base, report }) {
     }
     report.check('con la CSP aplicada, cero violaciones y cero errores de consola (tema, paleta, scroll, copiar correo; ES, EN y 404; ambos temas)', problemas.length === 0, problemas.join(' || '));
 
-    // La CSP muerde de verdad: un script en línea inyectado se bloquea (la prueba no es vacía).
-    {
-      const ctx = await browser.newContext({ viewport: VIEWPORTS.d });
-      await ctx.addInitScript(() => { window.__csp = []; document.addEventListener('securitypolicyviolation', (e) => window.__csp.push(e.violatedDirective)); });
-      const page = await ctx.newPage();
-      await page.goto(srv.base + '/index.html');
-      const r2 = await page.evaluate(async () => {
-        window.__ejecutado = false;
-        const s = document.createElement('script');
-        s.textContent = 'window.__ejecutado = true';
-        document.head.appendChild(s);
-        await new Promise((ok) => { const t0 = () => (window.__csp.length ? ok() : requestAnimationFrame(t0)); t0(); });
-        return { ejecutado: window.__ejecutado, v: window.__csp };
-      });
-      report.check('la CSP bloquea un script en línea inyectado (la prueba de CSP no es vacía)', !r2.ejecutado && r2.v.some((d) => d.startsWith('script-src')), JSON.stringify(r2));
-      await ctx.close();
-    }
+    // (Que la CSP bloquea un script inyectado lo comprueba la biblioteca del kit: tests/front, prueba «csp».)
 
     // 404 bajo una ruta profunda: se ve bien (hoja de estilos, fuente y marco cargados) y responde 404.
     mkdirSync(join(ROOT, 'design', 'refs', 'sitio'), { recursive: true });

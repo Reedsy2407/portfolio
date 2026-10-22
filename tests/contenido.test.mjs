@@ -1,5 +1,6 @@
-// Contenido: legible sin JavaScript, enlaces externos con rel correcto, aviso del sistema real, semántica básica
-// y reglas de estilo del brief (sin degradados, sin backdrop-filter, sin emoji, solo opacity/transform).
+// Contenido propio del portafolio: texto esperado sin JavaScript, enlaces esperados, aviso del sistema real, semántica
+// y reglas de estilo del brief (sin degradados, sin backdrop-filter, solo opacity/transform). Lo genérico (rel de los
+// enlaces externos, enlaces internos, teléfonos y clientes finales) lo comprueba la biblioteca del kit (tests/front).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { PAGES, ROOT, VIEWPORTS, open } from './lib.mjs';
@@ -57,30 +58,12 @@ export async function run({ browser, base, report }) {
         pendientes: [...document.querySelectorAll('.todo')].map((e) => e.textContent),
       };
     });
-    const mal = info.ext.filter((a) => a.target !== '_blank' || !/noopener/.test(a.rel) || !/noreferrer/.test(a.rel));
-    report.check(`${p.path}: enlaces externos con target=_blank y rel="noopener noreferrer"`, info.ext.length > 0 && mal.length === 0, mal.map((a) => a.href).join(', '));
     const faltan = EXTERNOS.filter((h) => !info.ext.some((a) => a.href === h || a.href === h + '/'));
     report.check(`${p.path}: enlaces esperados presentes`, faltan.length === 0, faltan.join(', '));
     report.check(`${p.path}: los enlaces externos avisan de la pestaña nueva`, info.ext.every((a) => /pestaña nueva|new tab/.test(a.label)), '');
     report.check(`${p.path}: aviso de despertar visible y antes del botón del sistema real`, info.avisoAntes && info.avisoVisible && info.describe === 'aviso-sistema');
     report.check(`${p.path}: un h1, landmarks, sin roles inventados, decoración aria-hidden, sin emoji`, info.h1 === 1 && info.landmarks && info.roles === 0 && info.ariaHiddenDeco && !info.emoji, JSON.stringify({ h1: info.h1, lm: info.landmarks, roles: info.roles, deco: info.ariaHiddenDeco, emoji: info.emoji }));
     report.check(`${p.path}: ningún marcador «por confirmar» visible`, info.pendientes.length === 0, info.pendientes.join(', '));
-    await context.close();
-  }
-
-  // Enlaces internos: cada archivo enlazado existe y cada ancla apunta a un id presente.
-  for (const p of PAGES) {
-    const { context, page } = await open(browser, base, p.path, { viewport: VIEWPORTS.d });
-    const hrefs = await page.evaluate(() => [...new Set([...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')).filter((h) => !/^(https?|mailto|tel):/.test(h)))]);
-    const rotos = [];
-    for (const h of hrefs) {
-      const url = new URL(h, page.url());
-      if (url.pathname !== new URL(page.url()).pathname) {
-        const r = await page.request.head(url.origin + url.pathname);
-        if (r.status() !== 200) rotos.push(h);
-      } else if (url.hash && !(await page.evaluate((id) => Boolean(document.getElementById(id)), url.hash.slice(1)))) rotos.push(h);
-    }
-    report.check(`${p.path}: enlaces internos y anclas válidos (${hrefs.length})`, rotos.length === 0, rotos.join(', '));
     await context.close();
   }
 
@@ -105,7 +88,4 @@ export async function run({ browser, base, report }) {
   report.check('páginas sin «Lorem ipsum» ni Co-Authored', !/lorem ipsum|co-authored/i.test(html));
   const correos = [...new Set(html.match(/[\w.+-]+@[\w-]+\.[\w.]+/g) || [])];
   report.check('el único correo publicado es el confirmado', correos.length === 1 && correos[0] === 'saenzvelarde2006@gmail.com', correos.join(', '));
-  const prohibidos = ['cliente-1', 'cliente-3', 'cliente-4'].filter((n) => new RegExp(n, 'i').test(html)).concat(/\bcliente-2\b/i.test(html) ? ['cliente-2'] : []);
-  report.check('ningún HTML nombra a los clientes finales (cliente-1, cliente-2, cliente-3 Schools, cliente-4)', prohibidos.length === 0, prohibidos.join(', '));
-  report.check('ningún HTML enlaza teléfonos (tel:, WhatsApp, wa.me)', !/href="(tel:|sms:|https?:\/\/(wa\.me|api\.whatsapp|wa\.link))/i.test(html));
 }

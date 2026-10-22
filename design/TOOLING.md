@@ -29,3 +29,11 @@ Si una herramienta escribe archivos propios en la raíz (por ejemplo notas de pr
 
 ## Fuentes tipográficas
 Se descargan como archivos estáticos con la versión fijada, sin instalar paquetes ni ejecutar scripts, y van con su licencia. Solo el subconjunto necesario, en woff2.
+
+Registro de las fuentes en uso (nombre del archivo → licencia; los textos completos están en `assets/fonts/`):
+- `pixelify-sans-latin-700-normal` · Pixelify Sans 700 · OFL 1.1 · `LICENSE-pixelify-sans-OFL.txt`
+- `geist-mono-latin-400-normal` y `geist-mono-latin-700-normal` · Geist Mono · OFL 1.1 · `LICENSE-geist-mono-OFL.txt`
+- `instrument-sans-latin-400-normal` · Instrument Sans 400 · OFL 1.1 · `LICENSE-instrument-sans-OFL.txt`
+
+## Impeccable: opcional por proyecto
+Nunca entra al núcleo del kit (ADR 0004). Si un proyecto la quiere, se instala como guía escrita con las reglas de arriba y se usa **sobre el sitio ya construido**: `/critique`, `/audit` y `/polish`. No se usa `/overdrive`. Siempre manda el brief.

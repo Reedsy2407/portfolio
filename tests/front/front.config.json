@@ -1,0 +1,48 @@
+{
+  "_ayuda": "Configuración de las pruebas de front del portafolio. Corre con «npm run front» (sirve dist/: genéralo antes con «npm run publicar»; --url prueba un sitio ya publicado). Se omite la prueba «contraste» de la biblioteca (suma una capa clara y una oscura al peor caso; las texturas de este sitio solo oscurecen, con alfa propia por tema) y se conserva tests/contraste.test.mjs. Lo que no está aquí toma el valor por defecto de la biblioteca (design/FRONTEND.md).",
+  "version": 1,
+  "paginas": [
+    { "ruta": "/index.html", "tipo": "portada" },
+    { "ruta": "/en/index.html", "tipo": "portada" },
+    { "ruta": "/404.html", "tipo": "404" }
+  ],
+  "temas": ["dark", "light"],
+  "origen": { "carpeta": "dist", "url": null, "cabeceras": true },
+  "viewports": { "movil": [360, 740], "tableta": [768, 1024], "escritorio": [1280, 800] },
+  "umbrales": {
+    "contrasteTexto": 4.5,
+    "contrasteTextoGrande": 3,
+    "texturaAlfaMax": 0.08,
+    "anchosSinDesborde": [360, 768, 1280],
+    "objetivoPx": 44,
+    "focoPx": 3,
+    "textoMinimoPx": 15,
+    "textoBasePx": 18,
+    "cicloMinimoMs": 340,
+    "pesoPortadaKB": 150,
+    "jsKB": 15,
+    "fuentesMax": 4,
+    "cpuLimitePct": 10,
+    "cpuObjetivoPct": 2,
+    "cpuMuestras": 3,
+    "cpuVentanaMs": 6000
+  },
+  "selectores": {
+    "objetivos": ".btn, .tag, .chip, .tabs a, .explorer a, .explorer summary, .lang a, .tool, .act:not(.off), .mark, dialog a",
+    "excluirObjetivos": [".skip"],
+    "decorativos": [".fx"],
+    "ignorarTexto": [".sr", "[hidden]"]
+  },
+  "contenido": { "minCaracteres": 200, "textoEsperado": [], "externosEnPestanaNueva": true, "sinEmoji": true },
+  "datosSensibles": {
+    "telefonos": true,
+    "patrones": [
+      { "nombre": "enlace de teléfono o WhatsApp", "regex": "tel:|sms:|wa\\.me|wa\\.link|api\\.whatsapp\\.com|web\\.whatsapp\\.com" }
+    ],
+    "nombresProhibidos": ["cliente-1", "cliente-2", "cliente-3", "cliente-4"],
+    "ignorar": []
+  },
+  "fuentes": { "licencias": "design/TOOLING.md" },
+  "dist": { "carpeta": "dist", "permitidos": ["index.html", "404.html", "_headers", "en/index.html", "assets/css/site.css", "assets/js/site.js", "assets/favicon.svg", "assets/**"], "prohibidos": ["\\.(png|jpe?g|gif|webp)$", "(^|/)\\.[^/]"] },
+  "pruebas": { "cpu": true }
+}

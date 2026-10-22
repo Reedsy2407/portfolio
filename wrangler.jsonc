@@ -1,5 +1,5 @@
 {
-  // Solo archivos estáticos: sin script (main) ni binding ASSETS. Se publica la carpeta dist/ que genera «npm run publish».
+  // Solo archivos estáticos: sin script (main) ni binding ASSETS. Se publica la carpeta dist/ que genera «npm run publicar».
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "portafolio",
   "compatibility_date": "2026-10-19",

@@ -35,7 +35,7 @@ Las páginas HTML se generan: edita el contenido en `scripts/build.mjs` y ejecut
 ## Preparar la publicación
 
 ```
-npm run publish
+npm run publicar
 ```
 
 (o `node scripts/publish.mjs`). Genera el sitio, vacía y recrea `dist/` (ignorada por git) y copia solo una lista permitida. No despliega nada ni usa la red. `dist/` contiene exactamente:
@@ -57,7 +57,7 @@ Nada más entra en `dist/` (ni `design/`, `tests/`, `scripts/`, `package*.json`,
 npm run deploy
 ```
 
-Ejecuta primero `npm run publish` y luego `wrangler deploy`. La primera vez, wrangler pide el nombre del subdominio de `workers.dev`. `.gitattributes` fija los finales de línea en LF y trata los PDF y las fuentes como binarios.
+Ejecuta primero `npm run publicar` y luego `wrangler deploy`. La primera vez, wrangler pide el nombre del subdominio de `workers.dev`. `.gitattributes` fija los finales de línea en LF y trata los PDF y las fuentes como binarios.
 
 ## Pruebas
 
@@ -75,17 +75,24 @@ node tests/run.mjs
 
 (o `npm test`). Para correr un grupo, pasa parte de su nombre: `node tests/run.mjs contraste`. Si ya tienes `playwright-core` instalado en otra carpeta, indica su ruta con la variable `PLAYWRIGHT_CORE`; si el navegador no está en la caché de Playwright, con `CHROMIUM_PATH`.
 
-Qué comprueban:
+Qué comprueban las pruebas propias del sitio (`tests/`):
 
-- **peso**: portada ≤ 150 KB, JS ≤ 15 KB, sin peticiones a otros orígenes, máximo cuatro fuentes;
 - **contraste**: AA en todo el texto, de ambos temas, contra el peor caso (resplandor entero y líneas de escaneo a su alfa máxima);
-- **maquetación**: sin desborde horizontal a 360 px, objetivos de 44 px, foco visible de 3 px, texto de 15 px o más y números de línea a toda la altura;
-- **movimiento**: `prefers-reduced-motion` (apaga partículas, glitch, tecleo, entrada y cursor parpadeante), partículas, glitch único, líneas ≤ 8 %, solo `opacity` y `transform`, botón de tema;
-- **contenido**: legible sin JavaScript, enlaces externos con `rel="noopener noreferrer"`, aviso previo al sistema real, anclas válidas, reglas de estilo del brief;
+- **maquetación**: objetivos de 44 px con el menú móvil abierto, texto de 15 px o más y números de línea a toda la altura;
+- **movimiento**: `prefers-reduced-motion` (apaga partículas, glitch, tecleo, entrada y cursor parpadeante), partículas, glitch único, botón de tema;
+- **contenido**: texto esperado sin JavaScript, enlaces esperados, aviso previo al sistema real, reglas de estilo del brief;
 - **pulido**: copiar el correo (con y sin JavaScript, sin enlace «Escribir»), iconos `aria-hidden`, secciones quitadas, disponibilidad única, enlaces de proyecto y legibilidad de la línea de tiempo (interlineado, ancho de línea, aire entre puestos);
-- **publicación**: `dist/` con exactamente la lista permitida, enlaces internos y recursos sin romper, el CV, ausencia de teléfono y de clientes finales, cabeceras presentes y la CSP aplicada de verdad (cero violaciones y cero errores de consola al usar tema, paleta, scroll y copiar el correo), y el 404 bajo una ruta profunda;
-- **datos confirmados**: el CV nunca queda como enlace roto, ningún número parece un teléfono, el único correo es el confirmado y no se nombra a los clientes finales;
-- **CPU en reposo**: se mide y se informa (objetivo ≈ 2 % de un núcleo). Se mide en un navegador sin interfaz con rasterizado por software, así que no sustituye a una medición con GPU real.
+- **publicación**: enlaces internos y recursos de `dist/` sin romper, el CV, cabeceras presentes y la CSP aplicada de verdad (cero violaciones y cero errores de consola al usar tema, paleta, scroll y copiar el correo), y el 404 bajo una ruta profunda;
+- **datos confirmados**: el CV nunca queda como enlace roto.
+
+La biblioteca de pruebas de front (`tests/front/`) comprueba `dist/`, el sitio que se publica. Genera `dist/` y córrela:
+
+```
+npm run publicar
+npm run front
+```
+
+Cubre la lista permitida de `dist/`, teléfonos y nombres que no deben aparecer, contenido legible sin JavaScript y enlaces, sin desborde horizontal, objetivos de 44 px y foco de 3 px, solo `opacity` y `transform`, texturas ≤ 8 % y `prefers-reduced-motion`, peso (portada ≤ 150 KB, JS ≤ 15 KB, sin otros orígenes, máximo cuatro fuentes con licencia), la CSP y la CPU en reposo (objetivo ≈ 2 % de un núcleo; se mide en un navegador sin interfaz con rasterizado por software, así que no sustituye a una medición con GPU real). Su configuración está en `tests/front/front.config.json`. El contraste AA lo comprueba `tests/contraste.test.mjs`, que conoce la textura de este sitio.
 
 Para generar capturas locales (360, 1280 y 1920 px, tema oscuro y claro) en `design/refs/sitio/`: `node tests/capturas.mjs`.
 

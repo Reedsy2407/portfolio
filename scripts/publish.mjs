@@ -9,32 +9,36 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
 
-/** Lo único que entra en dist/ (más el archivo de cabeceras, que se genera). */
+/* Lo único que entra en dist/ (más _headers, que se genera). Añadir algo aquí es una decisión: nunca design/, kit/, tests/,
+   .claude/, scripts/, package*.json, CLAUDE.md, HANDOFF.md ni capturas (lo comprueba la prueba «dist» de tests/front). */
 const PERMITIDOS = ['index.html', '404.html', 'en', 'assets'];
 
-// 1. Primero el build del sitio.
-const build = spawnSync(process.execPath, [join(ROOT, 'scripts', 'build.mjs')], { stdio: 'inherit' });
-if (build.status !== 0) {
-  console.error('El build falló; no se toca dist/.');
-  process.exit(1);
+// 1. Si el sitio se genera, primero el build; si falla no se toca dist/.
+if (existsSync(join(ROOT, 'scripts', 'build.mjs'))) {
+  const build = spawnSync(process.execPath, [join(ROOT, 'scripts', 'build.mjs')], { stdio: 'inherit', timeout: 300000 });
+  if (build.status !== 0) {
+    console.error('El build falló; no se toca dist/.');
+    process.exit(1);
+  }
 }
 
-// 2. Limpiar y recrear dist/ y copiar la lista permitida.
+// 2. Vaciar dist/ y copiar la lista permitida.
 if (relative(ROOT, DIST) !== 'dist') throw new Error('Ruta de dist/ inesperada');
-/* Se vacía el contenido en vez de borrar la carpeta: en Windows un proceso que la tenga abierta impide borrarla. */
+/* Se vacía el contenido, con reintentos, en vez de borrar la carpeta: en Windows un proceso que la tenga abierta
+   (EBUSY) impide borrarla. */
 mkdirSync(DIST, { recursive: true });
 for (const e of readdirSync(DIST)) rmSync(join(DIST, e), { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
 for (const nombre of PERMITIDOS) {
   const origen = join(ROOT, nombre);
-  if (!existsSync(origen)) throw new Error(`Falta «${nombre}» en el repositorio`);
+  if (!existsSync(origen)) throw new Error(`Falta «${nombre}» en el proyecto`);
   cpSync(origen, join(DIST, nombre), { recursive: true });
 }
 
 // 3. El 404 de dist/ funciona bajo cualquier ruta: rutas absolutas desde la raíz (el 404 de desarrollo no cambia).
 const f404 = join(DIST, '404.html');
-writeFileSync(f404, readFileSync(f404, 'utf8').replace(/\b(href|src)="(?!\/|#|https?:|mailto:|data:)([^"]*)"/g, '$1="/$2"'));
+writeFileSync(f404, readFileSync(f404, 'utf8').replace(/\b(href|src)="(?!\/|#|https?:|mailto:|tel:|data:)([^"]*)"/g, '$1="/$2"'));
 
-// 4. Cabeceras: la CSP autoriza por hash el script en línea de cada página.
+// 4. Cabeceras: la CSP autoriza por hash el script en línea de cada página (sin 'unsafe-inline' en scripts).
 const paginas = [];
 const recorrer = (dir) => {
   for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -46,14 +50,17 @@ const recorrer = (dir) => {
 recorrer(DIST);
 const hashes = new Set();
 for (const p of paginas) {
-  for (const [, cuerpo] of readFileSync(p, 'utf8').matchAll(/<script>([\s\S]*?)<\/script>/g)) {
+  for (const [, cuerpo] of readFileSync(p, 'utf8').matchAll(/<script(?![^>]*\ssrc\s*=)[^>]*>([\s\S]*?)<\/script>/gi)) { // en línea, con o sin atributos (type="module"…)
     hashes.add(`'sha256-${createHash('sha256').update(cuerpo).digest('base64')}'`);
   }
 }
 if (!hashes.size) throw new Error('No se encontró el script en línea del <head>');
 const plantilla = readFileSync(join(ROOT, 'scripts', '_headers.template'), 'utf8');
-/* Sin líneas de comentario en dist/_headers: así no se depende de cómo cada plataforma interprete «#». */
-const cabeceras = plantilla.replaceAll('{{SCRIPT_HASHES}}', [...hashes].join(' ')).split('\n').filter((l) => !l.startsWith('#')).join('\n').replace(/^\n+/, '');
+/* Sin líneas de comentario en dist/_headers: no se depende de cómo cada plataforma interprete «#». */
+const cabeceras = plantilla
+  .replaceAll('{{SCRIPT_HASHES}}', [...hashes].join(' '))
+  .replace(/ +;/g, ';')
+  .split('\n').filter((l) => !l.startsWith('#')).join('\n').replace(/^\n+/, '');
 writeFileSync(join(DIST, '_headers'), cabeceras);
 
 // 5. Resumen: contenido exacto y tamaño total.

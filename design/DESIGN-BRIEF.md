@@ -72,7 +72,7 @@
 - Las partículas no cambian (12, misma posición y comportamiento).
 
 ### Publicación (22 oct 2026)
-- `npm run publish` genera `dist/` con una lista permitida y las cabeceras de seguridad (`scripts/_headers.template`). CSP: todo del mismo origen; script en línea del tema autorizado por hash; `style-src-attr 'unsafe-inline'` solo para los atributos `style="…"` (propiedades personalizadas de efectos y el SVG de iconos oculto), sin hojas ni `<style>` en línea; `img-src` con `data:` por las texturas SVG de las líneas de escaneo.
+- `npm run publicar` genera `dist/` con una lista permitida y las cabeceras de seguridad (`scripts/_headers.template`). CSP: todo del mismo origen; script en línea del tema autorizado por hash; `style-src-attr 'unsafe-inline'` solo para los atributos `style="…"` (propiedades personalizadas de efectos y el SVG de iconos oculto), sin hojas ni `<style>` en línea; `img-src` con `data:` por las texturas SVG de las líneas de escaneo.
 - Sin hash en los nombres de assets: caché corta con revalidación. Si algún día se quiere caché inmutable, hay que añadir hash a los nombres en `publish.mjs`.
 
 ### Defectos de D2 ya corregidos en D3

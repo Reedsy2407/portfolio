@@ -1,9 +1,8 @@
 // Utilidades de las pruebas: servidor estático en proceso, carga de Playwright y un registro de resultados mínimo.
-import http from 'node:http';
-import { readFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { dirname, extname, join, normalize, sep } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { iniciarServidor } from './front/lib/servidor.mjs';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -14,65 +13,17 @@ export const PAGES = [
   { path: '/404.html', lang: 'es', kind: '404' },
 ];
 
-const MIME = {
-  '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
-  '.svg': 'image/svg+xml', '.pdf': 'application/pdf', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
-};
-
-/** Lee un archivo `_headers` (formato de Cloudflare Pages): bloques con una ruta y cabeceras con sangría. */
-export function parseHeaders(texto) {
-  const reglas = [];
-  let actual = null;
-  for (const linea of texto.split('\n')) {
-    if (!linea.trim() || linea.trim().startsWith('#')) continue;
-    if (/^\s/.test(linea)) {
-      const i = linea.indexOf(':');
-      if (actual && i > 0) actual.cabeceras.push([linea.slice(0, i).trim(), linea.slice(i + 1).trim()]);
-    } else {
-      actual = { ruta: linea.trim(), cabeceras: [] };
-      reglas.push(actual);
-    }
-  }
-  return reglas;
-}
-
-const rutaCoincide = (patron, ruta) => new RegExp('^' + patron.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$').test(ruta);
+// El servidor de pruebas es el de la biblioteca de front del kit: aplica el _headers, responde 404.html y evita los puertos
+// que Chrome bloquea (ERR_UNSAFE_PORT), que con un puerto aleatorio hacían fallar las pruebas al azar.
+export { parseHeaders, PUERTOS_NO_SEGUROS } from './front/lib/servidor.mjs';
 
 /**
  * Sirve una carpeta (por defecto la raíz del repositorio) en un puerto libre. Las rutas que no existen responden con
  * 404.html y estado 404. Con `headers` (texto de un `_headers`) aplica las cabeceras que coinciden con cada ruta.
  */
-export function startServer({ root = ROOT, headers = null } = {}) {
-  const reglas = headers ? parseHeaders(headers) : [];
-  const extra = (ruta) => {
-    const h = {};
-    for (const r of reglas) if (rutaCoincide(r.ruta, ruta)) for (const [k, v] of r.cabeceras) h[k] = h[k] ? `${h[k]}, ${v}` : v;
-    return h;
-  };
-  const server = http.createServer(async (req, res) => {
-    const url = new URL(req.url, 'http://localhost');
-    let rel = decodeURIComponent(url.pathname);
-    const pedida = rel;
-    if (rel.endsWith('/')) rel += 'index.html';
-    const file = normalize(join(root, rel));
-    const dentro = file.startsWith(root + sep);
-    try {
-      if (!dentro || !(await stat(file)).isFile()) throw new Error('no');
-      const tipo = { 'content-type': MIME[extname(file)] ?? 'application/octet-stream', ...extra(pedida) };
-      if (req.method === 'HEAD') { res.writeHead(200, { ...tipo, 'content-length': (await stat(file)).size }); res.end(); return; }
-      res.writeHead(200, tipo);
-      res.end(await readFile(file));
-    } catch {
-      res.writeHead(404, { 'content-type': MIME['.html'], ...extra(pedida) });
-      res.end(await readFile(join(root, '404.html')));
-    }
-  });
-  return new Promise((resolve) => {
-    server.listen(0, '127.0.0.1', () => resolve({
-      base: `http://127.0.0.1:${server.address().port}`,
-      close: () => new Promise((r) => server.close(r)),
-    }));
-  });
+export async function startServer({ root = ROOT, headers = null } = {}) {
+  const servidor = await iniciarServidor({ carpeta: root, cabeceras: headers ?? false });
+  return { base: servidor.base, close: servidor.cerrar };
 }
 
 /** Playwright: `playwright-core` del proyecto, o la carpeta que indique PLAYWRIGHT_CORE. */
