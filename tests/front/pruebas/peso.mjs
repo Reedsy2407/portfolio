@@ -1,5 +1,5 @@
 // Presupuesto: peso de la portada, JavaScript, ninguna petición a otros orígenes y fuentes (máximo y con licencia
-// anotada cuando se indica un registro de licencias).
+// anotada cuando se indica un registro de licencias: por el nombre del archivo o por la familia y una referencia de licencia).
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { abrir, mismoOrigen } from '../lib/navegador.mjs';
@@ -9,6 +9,30 @@ export const id = 'peso';
 export const nombre = 'peso, dependencias y fuentes';
 
 const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
+
+const SUFIJOS = /^(latin|latin-ext|cyrillic|cyrillic-ext|greek|greek-ext|vietnamese|arabic|hebrew|devanagari|symbols|variable|normal|italic|oblique|regular|thin|extralight|light|medium|semibold|bold|extrabold|black|\d{3}|wght|subset)$/i;
+const LICENCIA = /\b(OFL|SIL|Open Font License|MIT|Apache|CC0|GPL|licen[cs]e|licencia)\b/i;
+const plano = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+
+/** La familia de un archivo de fuente: «geist-mono-latin-400-normal.woff2» → «geist-mono». */
+export function familiaDeFuente(archivo) {
+  const partes = archivo.replace(/\.[^.]+$/, '').split(/[-_\s]+/).filter(Boolean);
+  const i = partes.findIndex((p, n) => n > 0 && SUFIJOS.test(p));
+  return (i > 0 ? partes.slice(0, i) : partes).join('-');
+}
+
+/**
+ * ¿Está la fuente en el registro de licencias? Vale el nombre del archivo tal cual, o una línea que nombre la familia
+ * («Geist Mono», «geist-mono») y mencione una licencia (OFL, MIT, Apache, «licencia»…): así un registro normal no tiene
+ * que repetir el nombre de archivo. Devuelve 'archivo', 'familia' o null.
+ */
+export function licenciaAnotada(registro, archivo) {
+  const base = archivo.replace(/\.[^.]+$/, '');
+  if (registro.includes(base)) return 'archivo';
+  const familia = plano(familiaDeFuente(archivo));
+  if (familia.length >= 3 && registro.split(/\r?\n/).some((l) => plano(l).includes(familia) && LICENCIA.test(l))) return 'familia';
+  return null;
+}
 
 export async function run({ browser, base, report, config, proyecto = process.cwd() }) {
   const u = config.umbrales;
@@ -52,7 +76,7 @@ export async function run({ browser, base, report, config, proyecto = process.cw
     report.check(`${p.ruta}: sin peticiones a otros orígenes`, externos.length === 0, externos.slice(0, 3).join(', '));
     report.check(`${p.ruta}: máximo ${u.fuentesMax} archivos de fuente`, fuentes.length <= u.fuentesMax, String(fuentes.length));
     if (textoLicencias !== null) {
-      const sin = fuentes.map((f) => basename(f.url).replace(/\.[^.]+$/, '')).filter((n) => !textoLicencias.includes(n));
+      const sin = fuentes.map((f) => basename(f.url)).filter((n) => !licenciaAnotada(textoLicencias, n)).map((n) => n.replace(/\.[^.]+$/, ''));
       report.check(`${p.ruta}: cada fuente tiene su licencia anotada en ${config.fuentes.licencias}`, sin.length === 0, sin.join(', '));
     }
   }

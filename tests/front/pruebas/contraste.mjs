@@ -1,15 +1,17 @@
 // Contraste AA calculado contra el peor caso, en cada tema y página. Cada texto visible se mide sobre su fondo efectivo;
 // si lleva resplandor (text-shadow) el fondo se mezcla también con el color del resplandor, y si él o un ancestro tiene
-// una imagen de fondo (textura de líneas, puntos) se mide además con esa capa oscureciendo y aclarando hasta
-// `umbrales.texturaAlfaMax`. Se toma el peor caso. No depende de nombres de clase: solo de estilos calculados.
+// una imagen de fondo (textura de líneas, puntos) se mide además con esa capa. Con `contraste.texturas: "auto"` se lee la
+// textura real (color y alfa de su SVG); si no se puede leer, o si se declara "ambas", "oscurecen" o "aclaran" (también por
+// tema), la capa oscurece y/o aclara hasta `umbrales.texturaAlfaMax` (también por tema). Se toma el peor caso.
+// No depende de nombres de clase: solo de estilos calculados.
 import { abrir, esperarEstable, nombreTema } from '../lib/navegador.mjs';
 import { colorFactory } from '../lib/color.mjs';
-import { paginasDe } from '../lib/config.mjs';
+import { paginasDe, porTema } from '../lib/config.mjs';
 
 export const id = 'contraste';
 export const nombre = 'contraste AA (peor caso)';
 
-function medir({ texturaAlfa, ignorar }, fabricaColor) {
+function medir({ texturaAlfa, modo, ignorar }, fabricaColor) {
   const { parse, over, ratio } = fabricaColor();
   const bgOf = (el) => {
     const capas = [];
@@ -21,9 +23,36 @@ function medir({ texturaAlfa, ignorar }, fabricaColor) {
     for (const c of capas.reverse()) base = over(c, base);
     return base;
   };
+  /* La imagen de fondo de la textura (la del propio elemento o la de un ancestro), o null. */
   const conTextura = (el) => {
-    for (let e = el; e; e = e.parentElement) if (/url\(/.test(getComputedStyle(e).backgroundImage)) return true;
-    return false;
+    for (let e = el; e; e = e.parentElement) if (/url\(/.test(getComputedStyle(e).backgroundImage)) return getComputedStyle(e).backgroundImage;
+    return null;
+  };
+  /* Las capas reales de una textura SVG en data URI: [{ r, g, b, a }], o null si no se puede leer. */
+  const capasDe = (imagen) => {
+    const u = imagen.match(/url\(\s*(?:"([^"]*)"|'([^']*)'|([^)]*))\s*\)/);
+    const m = u && (u[1] ?? u[2] ?? u[3]).match(/^data:image\/svg\+xml[^,]*,([\s\S]*)$/);
+    if (!m) return null;
+    let svg;
+    try { svg = decodeURIComponent(m[1]); } catch { return null; }
+    const nombrados = { black: [0, 0, 0], white: [255, 255, 255] };
+    /* Solo se entiende lo simple: formas con su propio fill. Lo demás (filtros, estilos, herencia, trazos, grupos, varias imágenes) no se interpreta y cae al peor caso configurado. */
+    if (/<(?:filter|style|g)\b|<svg\b[^>]*\b(?:fill|style|class)\s*=|\b(?:style|class|filter|stroke)\s*=|<(?!\/?(?:svg|rect|circle|ellipse|path|polygon|line)\b)[a-z]/i.test(svg) || /gradient\(/i.test(imagen) || (imagen.match(/url\(/g) ?? []).length !== 1) return null;
+    const capas = [];
+    for (const [, atributos] of svg.matchAll(/<(?:rect|circle|ellipse|path|polygon|line)\b([^>]*)>/g)) {
+      const atributo = (n) => { const a = atributos.match(new RegExp(`(?:^|\\s)${n}\\s*=\\s*["']([^"']*)["']`)); return a ? a[1].trim().toLowerCase() : null; };
+      const relleno = atributo('fill');
+      if (relleno === null) return null;
+      if (relleno === 'none') continue;
+      let rgb = nombrados[relleno];
+      const hex = relleno.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+      if (hex) { const h = hex[1].length === 3 ? [...hex[1]].map((c) => c + c).join('') : hex[1]; rgb = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)); }
+      if (!rgb) return null;
+      const alfa = Number(atributo('fill-opacity') ?? 1) * Number(atributo('opacity') ?? 1);
+      if (!(alfa >= 0)) return null;
+      capas.push({ r: rgb[0], g: rgb[1], b: rgb[2], a: alfa });
+    }
+    return capas.length ? capas : null;
   };
   const resultados = [];
   const visto = new Set();
@@ -49,7 +78,13 @@ function medir({ texturaAlfa, ignorar }, fabricaColor) {
       if (brillo && brillo.a > 0) fondos.push(over(brillo, bg));
     }
     const todos = [...fondos];
-    if (texturaAlfa > 0 && conTextura(el)) for (const b of fondos) for (const k of [0, 255]) todos.push(over({ r: k, g: k, b: k, a: texturaAlfa }, b));
+    const imagen = conTextura(el);
+    if (imagen) {
+      /* Textura leída tal cual (auto) o, si no se puede leer o se declara, una capa gris extrema hasta texturaAlfa. */
+      const reales = modo === 'auto' ? capasDe(imagen) : null;
+      const extremos = texturaAlfa > 0 ? [0, 255].filter((k) => modo === 'ambas' || modo === 'auto' || (modo === 'oscurecen' ? k === 0 : k === 255)).map((k) => ({ r: k, g: k, b: k, a: texturaAlfa })) : [];
+      for (const b of fondos) for (const capa of reales ?? extremos) todos.push(over(capa, b));
+    }
     let min = Infinity;
     for (const b of todos) min = Math.min(min, ratio(fg.a < 1 ? over(fg, b) : fg, b));
     resultados.push({ texto: n.textContent.trim().slice(0, 28), ratio: min, grande, etiqueta: el.tagName.toLowerCase() });
@@ -60,9 +95,9 @@ function medir({ texturaAlfa, ignorar }, fabricaColor) {
 export async function run({ browser, base, report, config }) {
   const u = config.umbrales;
   /* La función y la fábrica de colores viajan como texto: una sola fuente de la aritmética (lib/color.mjs). */
-  const fuente = `(${medir})(${JSON.stringify({ texturaAlfa: u.texturaAlfaMax, ignorar: config.selectores.ignorarTexto })}, ${colorFactory})`;
   for (const p of paginasDe(config)) {
     for (const tema of config.temas) {
+      const fuente = `(${medir})(${JSON.stringify({ texturaAlfa: porTema(u.texturaAlfaMax, tema), modo: porTema(config.contraste.texturas, tema), ignorar: config.selectores.ignorarTexto })}, ${colorFactory})`;
       const { context, page } = await abrir(browser, base, p.ruta, { tema });
       await esperarEstable(page);
       const res = await page.evaluate(fuente);

@@ -35,6 +35,22 @@ export const PUERTOS_NO_SEGUROS = new Set([1719, 1720, 1723, 2049, 3659, 4045, 4
 
 export const rutaCoincide = (patron, ruta) => new RegExp(`^${patron.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}$`).test(ruta);
 
+/**
+ * Hace escuchar a un servidor en un puerto libre de 127.0.0.1 elegido por el sistema; si cae en uno que Chrome y fetch
+ * bloquean (ERR_UNSAFE_PORT, «bad port»), pide otro. Devuelve el puerto. También lo usan los servidores de las pruebas.
+ */
+export function escucharSeguro(servidor, intentos = 0) {
+  return new Promise((ok, fallo) => {
+    servidor.once('error', fallo);
+    servidor.listen(0, '127.0.0.1', () => {
+      servidor.off('error', fallo);
+      const { port } = servidor.address();
+      if (PUERTOS_NO_SEGUROS.has(port) && intentos < 50) servidor.close(() => escucharSeguro(servidor, intentos + 1).then(ok, fallo));
+      else ok(port);
+    });
+  });
+}
+
 /** Sirve `carpeta` en un puerto libre de 127.0.0.1. `cabeceras`: true usa `<carpeta>/_headers` si existe; o el texto de un `_headers`. */
 export function iniciarServidor({ carpeta, cabeceras = true } = {}) {
   const raiz = resolve(carpeta);
@@ -66,17 +82,7 @@ export function iniciarServidor({ carpeta, cabeceras = true } = {}) {
       res.end(req.method === 'HEAD' ? undefined : cuerpo);
     }
   });
-  /* Puerto libre elegido por el sistema; si cae en uno que Chrome bloquea, se pide otro. */
-  const escuchar = (intentos = 0) => new Promise((ok, fallo) => {
-    servidor.once('error', fallo);
-    servidor.listen(0, '127.0.0.1', () => {
-      servidor.off('error', fallo);
-      const { port } = servidor.address();
-      if (PUERTOS_NO_SEGUROS.has(port) && intentos < 50) servidor.close(() => escuchar(intentos + 1).then(ok, fallo));
-      else ok(port);
-    });
-  });
-  return escuchar().then((port) => ({
+  return escucharSeguro(servidor).then((port) => ({
     base: `http://127.0.0.1:${port}`,
     cerrar: () => new Promise((r) => { servidor.closeAllConnections?.(); servidor.close(r); }),
   }));

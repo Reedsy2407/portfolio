@@ -28,7 +28,8 @@ export const POR_DEFECTO = Object.freeze({
     ignorarTexto: ['.sr-only', '[hidden]'],
   },
   contenido: { minCaracteres: 200, textoEsperado: [], externosEnPestanaNueva: false, sinEmoji: true },
-  datosSensibles: { telefonos: true, patrones: [], nombresProhibidos: [], ignorar: [] },
+  contraste: { texturas: 'auto' },
+  datosSensibles: { telefonos: true, patrones: [], nombresProhibidos: [], ignorar: [], archivoPrivado: null, archivoPrivadoObligatorio: false },
   fuentes: { licencias: null },
   dist: { carpeta: 'dist', permitidos: ['index.html', '404.html', '_headers', 'assets/**'], prohibidos: [] },
   pruebas: { cpu: true },
@@ -44,16 +45,28 @@ function fusionar(base, extra) {
 }
 
 const TIPOS_PAGINA = ['portada', 'interior', '404'];
+const TEMAS = ['dark', 'light'];
+export const MODOS_TEXTURA = ['auto', 'oscurecen', 'aclaran', 'ambas'];
+export const AMBITOS = ['visible', 'atributos', 'codigo'];
+
+/** Valor de un ajuste que puede ser único o por tema ({ dark, light }). */
+export const porTema = (valor, tema) => (esObjeto(valor) ? valor[tema] : valor);
+
+/** Una entrada de `clics` normalizada: { selector, anchoMin, anchoMax }. */
+export const clicDe = (c) => (typeof c === 'string' ? { selector: c } : c);
+
+/** ¿Aplica el clic a este ancho de viewport? */
+export const clicAplica = (c, ancho) => (c.anchoMin === undefined || ancho >= c.anchoMin) && (c.anchoMax === undefined || ancho <= c.anchoMax);
 
 export function normalizarConfig(entrada = {}) {
   const errores = [];
   if (!esObjeto(entrada)) throw new ConfigInvalida(['el archivo debe ser un objeto JSON']);
-  for (const sec of ['umbrales', 'selectores', 'contenido', 'datosSensibles', 'fuentes', 'dist', 'pruebas', 'origen', 'viewports'])
+  for (const sec of ['umbrales', 'selectores', 'contenido', 'contraste', 'datosSensibles', 'fuentes', 'dist', 'pruebas', 'origen', 'viewports'])
     if (sec in entrada && !esObjeto(entrada[sec])) errores.push(`${sec} debe ser un objeto`);
   if (errores.length) throw new ConfigInvalida(errores);
   const c = fusionar(JSON.parse(JSON.stringify(POR_DEFECTO)), entrada);
   for (const k of Object.keys(entrada)) if (k !== '_ayuda' && !(k in POR_DEFECTO)) errores.push(`clave desconocida: «${k}»`);
-  for (const sec of ['umbrales', 'selectores', 'contenido', 'datosSensibles', 'fuentes', 'dist', 'pruebas', 'origen'])
+  for (const sec of ['umbrales', 'selectores', 'contenido', 'contraste', 'datosSensibles', 'fuentes', 'dist', 'pruebas', 'origen'])
     for (const k of Object.keys(entrada[sec] ?? {})) if (!(k in POR_DEFECTO[sec])) errores.push(`${sec}.${k}: clave desconocida`);
   if (c.version !== 1) errores.push('version debe ser 1');
 
@@ -61,7 +74,15 @@ export function normalizarConfig(entrada = {}) {
   else c.paginas.forEach((p, i) => {
     if (!p || typeof p.ruta !== 'string' || !p.ruta.startsWith('/')) errores.push(`paginas[${i}].ruta debe empezar por «/»`);
     if (!TIPOS_PAGINA.includes(p?.tipo)) errores.push(`paginas[${i}].tipo debe ser uno de ${TIPOS_PAGINA.join(', ')}`);
-    if (p?.clics !== undefined && !(Array.isArray(p.clics) && p.clics.every((s) => typeof s === 'string'))) errores.push(`paginas[${i}].clics debe ser una lista de selectores`);
+    if (p?.clics !== undefined) {
+      if (!Array.isArray(p.clics)) errores.push(`paginas[${i}].clics debe ser una lista de selectores o de { selector, anchoMin, anchoMax }`);
+      else p.clics.forEach((cl, j) => {
+        const ok = typeof cl === 'string' || (esObjeto(cl) && typeof cl.selector === 'string' && cl.selector
+          && ['anchoMin', 'anchoMax'].every((k) => cl[k] === undefined || (Number.isInteger(cl[k]) && cl[k] > 0))
+          && Object.keys(cl).every((k) => ['selector', 'anchoMin', 'anchoMax'].includes(k)));
+        if (!ok) errores.push(`paginas[${i}].clics[${j}] debe ser un selector o { selector, anchoMin?, anchoMax? } con anchos enteros positivos`);
+      });
+    }
   });
   if (!Array.isArray(c.temas) || !c.temas.length || !c.temas.every((t) => ['dark', 'light'].includes(t))) errores.push('temas debe ser una lista con «dark» y/o «light»');
   if (!esObjeto(c.viewports) || !Object.values(c.viewports).every((v) => Array.isArray(v) && v.length === 2 && v.every((n) => Number.isInteger(n) && n > 0))) errores.push('viewports debe ser { nombre: [ancho, alto] } con enteros positivos');
@@ -70,7 +91,12 @@ export function normalizarConfig(entrada = {}) {
   const u = c.umbrales;
   for (const k of ['contrasteTexto', 'contrasteTextoGrande', 'objetivoPx', 'focoPx', 'textoMinimoPx', 'cicloMinimoMs', 'pesoPortadaKB', 'jsKB', 'fuentesMax', 'cpuLimitePct', 'cpuObjetivoPct', 'cpuMuestras', 'cpuVentanaMs'])
     if (!(typeof u[k] === 'number' && u[k] > 0)) errores.push(`umbrales.${k} debe ser un número positivo`);
-  if (!(typeof u.texturaAlfaMax === 'number' && u.texturaAlfaMax >= 0 && u.texturaAlfaMax <= 1)) errores.push('umbrales.texturaAlfaMax debe estar entre 0 y 1');
+  const alfaOk = (n) => typeof n === 'number' && n >= 0 && n <= 1;
+  if (!(alfaOk(u.texturaAlfaMax) || (esObjeto(u.texturaAlfaMax) && Object.keys(u.texturaAlfaMax).every((k) => TEMAS.includes(k)) && TEMAS.every((k) => alfaOk(u.texturaAlfaMax[k])))))
+    errores.push('umbrales.texturaAlfaMax debe estar entre 0 y 1, o ser { dark, light } con ambos entre 0 y 1');
+  const tex = c.contraste.texturas;
+  if (!(MODOS_TEXTURA.includes(tex) || (esObjeto(tex) && Object.keys(tex).every((k) => TEMAS.includes(k)) && TEMAS.every((k) => MODOS_TEXTURA.includes(tex[k])))))
+    errores.push(`contraste.texturas debe ser ${MODOS_TEXTURA.join(', ')}, o { dark, light } con alguno de ellos`);
   if (u.textoBasePx !== null && !(typeof u.textoBasePx === 'number' && u.textoBasePx > 0)) errores.push('umbrales.textoBasePx debe ser un número positivo o null');
   if (!Array.isArray(u.anchosSinDesborde) || !u.anchosSinDesborde.every((n) => Number.isInteger(n) && n > 0)) errores.push('umbrales.anchosSinDesborde debe ser una lista de enteros positivos');
 
@@ -82,7 +108,10 @@ export function normalizarConfig(entrada = {}) {
   for (const [i, p] of d.patrones.entries()) {
     if (!p || typeof p.nombre !== 'string' || typeof p.regex !== 'string') { errores.push(`datosSensibles.patrones[${i}] necesita nombre y regex (texto)`); continue; }
     try { new RegExp(p.regex, p.flags ?? 'i'); } catch { errores.push(`datosSensibles.patrones[${i}].regex no es una expresión válida`); }
+    if (p.ambitos !== undefined && !(Array.isArray(p.ambitos) && p.ambitos.length && p.ambitos.every((a) => AMBITOS.includes(a)))) errores.push(`datosSensibles.patrones[${i}].ambitos debe ser una lista con ${AMBITOS.join(', ')}`);
   }
+  if (d.archivoPrivado !== null && !(typeof d.archivoPrivado === 'string' && d.archivoPrivado)) errores.push('datosSensibles.archivoPrivado debe ser una ruta (texto) o null');
+  if (typeof d.archivoPrivadoObligatorio !== 'boolean') errores.push('datosSensibles.archivoPrivadoObligatorio debe ser true o false');
   for (const [i, r] of d.ignorar.entries()) { try { new RegExp(r, 'i'); } catch { errores.push(`datosSensibles.ignorar[${i}] no es una expresión válida`); } }
   if (!(Array.isArray(d.nombresProhibidos) && d.nombresProhibidos.every((x) => typeof x === 'string' && x))) errores.push('datosSensibles.nombresProhibidos debe ser una lista de textos');
 

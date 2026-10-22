@@ -1,5 +1,5 @@
 {
-  "_ayuda": "Configuración de las pruebas de front del portafolio. Corre con «npm run front» (sirve dist/: genéralo antes con «npm run publicar»; --url prueba un sitio ya publicado). Se omite la prueba «contraste» de la biblioteca (suma una capa clara y una oscura al peor caso; las texturas de este sitio solo oscurecen, con alfa propia por tema) y se conserva tests/contraste.test.mjs. Lo que no está aquí toma el valor por defecto de la biblioteca (design/FRONTEND.md).",
+  "_ayuda": "Configuración de las pruebas de front del portafolio. Corre con «npm run front» (sirve dist/: genéralo antes con «npm run publicar»; --url prueba un sitio ya publicado). Se omite la prueba «contraste» de la biblioteca 0.3.1: con dos capas de textura apiladas en un mismo elemento (como aquí) su modo auto cae al peor caso y da falsos fallos; se conserva tests/contraste.test.mjs. Los nombres de clientes finales viven en tests/front/datos-privados.json (ignorado por git; si falta, la prueba «datos» avisa). Lo que no está aquí toma el valor por defecto de la biblioteca (design/FRONTEND.md).",
   "version": 1,
   "paginas": [
     { "ruta": "/index.html", "tipo": "portada" },
@@ -39,8 +39,10 @@
     "patrones": [
       { "nombre": "enlace de teléfono o WhatsApp", "regex": "tel:|sms:|wa\\.me|wa\\.link|api\\.whatsapp\\.com|web\\.whatsapp\\.com" }
     ],
-    "nombresProhibidos": ["cliente-1", "cliente-2", "cliente-3", "cliente-4"],
-    "ignorar": []
+    "nombresProhibidos": [],
+    "ignorar": [],
+    "archivoPrivado": "tests/front/datos-privados.json",
+    "archivoPrivadoObligatorio": false
   },
   "fuentes": { "licencias": "design/TOOLING.md" },
   "dist": { "carpeta": "dist", "permitidos": ["index.html", "404.html", "_headers", "en/index.html", "assets/css/site.css", "assets/js/site.js", "assets/favicon.svg", "assets/**"], "prohibidos": ["\\.(png|jpe?g|gif|webp)$", "(^|/)\\.[^/]"] },

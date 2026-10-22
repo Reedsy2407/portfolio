@@ -27,11 +27,6 @@ export async function run({ browser, base, report }) {
     const m = await open(browser, base, '/index.html', { viewport: VIEWPORTS.m });
     report.check('360 px: sin partículas', await m.page.evaluate(() => getComputedStyle(document.querySelector('.fx')).display === 'none'));
     await m.context.close();
-    // La biblioteca mide las texturas solo en el tema por defecto: aquí se vigila también el claro (≤ 8 %).
-    const c = await open(browser, base, '/index.html', { scheme: 'light' });
-    const lc = await c.page.evaluate(() => ['--scan', '--scan-name'].map((v) => Number(getComputedStyle(document.documentElement).getPropertyValue(v).match(/fill-opacity='([.\d]+)'/)[1])));
-    report.check('líneas de escaneo ≤ 8 % (claro)', lc.every((a) => a <= 0.08), lc.join(' y '));
-    await c.context.close();
   }
 
   // prefers-reduced-motion: todo quieto y el contenido visible.

@@ -1,8 +1,8 @@
 // Movimiento y efectos: solo opacity y transform animados, nada que parpadee (ciclo mínimo, WCAG 2.3.1), texturas
 // con alfa ≤ el máximo, decorativos aria-hidden y sin eventos, y prefers-reduced-motion que apaga lo infinito y deja
 // el contenido visible desde el primer cuadro. Sin nombres de clase del proyecto: lo decorativo se declara en la config.
-import { abrir, esperarEstable } from '../lib/navegador.mjs';
-import { paginasDe } from '../lib/config.mjs';
+import { abrir, esperarEstable, nombreTema } from '../lib/navegador.mjs';
+import { paginasDe, porTema } from '../lib/config.mjs';
 
 export const id = 'movimiento';
 export const nombre = 'movimiento, efectos y prefers-reduced-motion';
@@ -92,8 +92,15 @@ export async function run({ browser, base, report, config }) {
       const an = await page.evaluate(`(${animaciones})(${JSON.stringify(opciones)})`);
       report.check(`${p.ruta}: solo opacity y transform animados`, an.fuera.length === 0, an.fuera.join(', '));
       report.check(`${p.ruta}: nada parpadea (ciclo infinito ≥ ${u.cicloMinimoMs} ms)`, an.infinitas === 0 || an.cicloMinimo >= u.cicloMinimoMs, an.infinitas ? `${an.infinitas} infinitas, mínimo ${an.cicloMinimo} ms` : 'sin animaciones infinitas');
-      const alfas = await page.evaluate(`(${texturas})()`);
-      report.check(`${p.ruta}: texturas con alfa ≤ ${u.texturaAlfaMax * 100} %`, alfas.every((a) => a <= u.texturaAlfaMax), alfas.length ? `alfas ${[...new Set(alfas)].join(', ')}` : 'sin texturas');
+      /* Las texturas cambian con el tema (cada uno puede tener su alfa y su tope): se miden en todos los configurados. */
+      for (const tema of config.temas) {
+        const t = await abrir(browser, base, p.ruta, { tema });
+        await esperarEstable(t.page);
+        const alfas = await t.page.evaluate(`(${texturas})()`);
+        const tope = porTema(u.texturaAlfaMax, tema);
+        report.check(`${p.ruta} (${nombreTema(tema)}): texturas con alfa ≤ ${Math.round(tope * 1000) / 10} %`, alfas.every((a) => a <= tope), alfas.length ? `alfas ${[...new Set(alfas)].join(', ')}` : 'sin texturas');
+        await t.context.close();
+      }
       if (config.selectores.decorativos.length) {
         const mal = await page.evaluate(`(${decorativos})(${JSON.stringify({ selectores: config.selectores.decorativos })})`);
         report.check(`${p.ruta}: lo decorativo es aria-hidden y no recibe eventos`, mal.length === 0, mal.join('; '));

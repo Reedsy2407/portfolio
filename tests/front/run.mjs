@@ -53,8 +53,8 @@ export async function main(args, { stdout = process.stdout, stderr = process.std
       informes.push(informe);
       stdout.write(`${formatear(m.nombre, informe)}\n`);
     }
-    const { total, fallos } = resumen(informes);
-    stdout.write(`\n${total - fallos}/${total} comprobaciones correctas${fallos ? `; ${fallos} fallan` : ''}\n`);
+    const { total, fallos, avisos } = resumen(informes);
+    stdout.write(`\n${total - fallos}/${total} comprobaciones correctas${fallos ? `; ${fallos} fallan` : ''}${avisos ? `; ${avisos} aviso(s): hay cosas que no se pudieron comprobar (líneas con «!»)` : ''}\n`);
     return fallos ? 1 : 0;
   } catch (e) {
     stderr.write(`${e.message}\n`);
